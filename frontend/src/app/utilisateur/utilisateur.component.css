@@ -122,3 +122,9 @@ body {
     color: #28bc89;
   }
   
+  .logo-circle {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
