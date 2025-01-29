@@ -1,0 +1,36 @@
+.sidebar {
+  height: 100vh;
+  position: fixed;
+  border-radius: 10px;
+  overflow: hidden; /* Pour s'assurer que le contenu ne dépasse pas les bords arrondis */
+  background-color: #28BC89;
+  color: white;
+  box-shadow: 0 0 10px #28bc89;
+}
+
+.sidebar .logo img {
+  max-width: 100px;
+}
+
+.sidebar .nav-link {
+  color: white;
+  padding: 15px 20px; /* Ajoutez du padding pour plus d'espace */
+  transition: background-color 0.3s ease; /* Ajoutez une transition pour l'effet de survol */
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  background-color: #1e885d;
+  border-radius: 10px; /* Assurez-vous que les coins sont arrondis */
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.logo-circle {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}

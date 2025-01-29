@@ -1,0 +1,41 @@
+/*design du tableau*/
+.table {
+    border-collapse: separate; /* Important pour border-radius */
+    border-spacing: 0; /* Évite les espaces entre les lignes */
+    border-radius: 10px; /* Arrondi les bords du tableau */
+    overflow: hidden; /* Coupe les bords extérieurs */
+  
+    
+    
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .table thead tr:first-child th {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+  }
+  
+/* pour designer la pagination */
+.pagination .page-link {
+  color: #28BC89; /* Couleur du texte des liens de pagination */
+  border-color: #28BC89; /* Couleur de la bordure des liens de pagination */
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #28BC89; /* Couleur de fond pour la page active */
+  color: #ffff;
+  border-color: #28BC89; /* Couleur de la bordure pour la page active */
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #ccc; /* Couleur grise pour les pages désactivées */
+  border-color: #ccc; /* Bordure grise pour les pages désactivées */
+}
+
+.pagination .page-item:hover .page-link {
+  background-color: #28BC89; /* Fond vert lors du survol */
+  border-color: #28BC89; /* Bordure verte lors du survol */
+  color: #ffffff;
+}

@@ -1,0 +1,59 @@
+<div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <app-sidebar></app-sidebar>
+  
+      <!-- Main Content -->
+      <div class="col-md-10 offset-md-2 main-wrapper">
+        <!-- Navbar -->
+        <app-navbar></app-navbar>
+  
+        <main role="main" class="main-content">
+          <div class="inscription-form">
+            <h2 class="text-center mb-4">INSCRIPTION</h2>
+            <form (ngSubmit)="onSubmit()" #inscriptionForm="ngForm">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="prenom">Prénom</label>
+                  <input type="text" class="form-control" id="prenom" placeholder="Prénom" [(ngModel)]="prenom" name="prenom" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="nom">Nom</label>
+                  <input type="text" class="form-control" id="nom" placeholder="Nom" [(ngModel)]="nom" name="nom" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" placeholder="Email" [(ngModel)]="email" name="email" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="telephone">Téléphone</label>
+                  <input type="text" class="form-control" id="telephone" placeholder="Téléphone" [(ngModel)]="telephone" name="telephone" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="adresse">Adresse</label>
+                  <input type="text" class="form-control" id="adresse" placeholder="Adresse" [(ngModel)]="adresse" name="adresse" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="role">Rôle</label>
+                  <select class="form-control" id="role" [(ngModel)]="role" name="role" required>
+                    <option value="Administrateur">Administrateur</option>
+                    <option value="Utilisateur">Utilisateur</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="carte">Carte</label>
+                <input type="text" class="form-control" id="carte" placeholder="Carte" [(ngModel)]="carte" name="carte" disabled>
+              </div>
+              <button type="submit" class="btn btn-success btn-block" [disabled]="!inscriptionForm.valid">INSCRIRE</button>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  

@@ -1,123 +1,69 @@
 <div class="container-fluid">
-    <div class="row">
-      <!-- Sidebar -->
-      <nav class="col-md-2 d-none d-md-block bg-sidebar sidebar">
-        <div class="sidebar-sticky">
-            <div class="logo text-center my-4">
-                <img src="images/logo.png" alt="Logo" class="img-fluid logo-circle">
-              </div>
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-tachometer-alt"></i>
-                Dashboard
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="#">
-                <i class="fas fa-users"></i>
-                Gestion Utilisateurs
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-seedling"></i>
-                Gestion des plantes
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-history"></i>
-                Historiques
-              </a>
-            </li>
-          </ul>
+  <div class="row">
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Main Content -->
+    <div class="col-md-10 offset-md-2 main-wrapper">
+      <!-- Navbar -->
+      <app-navbar [searchTerm]="searchTerm"></app-navbar>
+
+      <main role="main" class="main-content">
+        <button type="button" class="btn btn-custom mb-3" (click)="addUser()">
+          <i class="fas fa-plus mr-2"></i> Ajouter un utilisateur
+        </button>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Téléphone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of paginatedUsers">
+                <td><img src="assets/user1.jpg" alt="{{ user.name }}" class="rounded-circle" width="30"></td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.phone }}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm mr-2" (click)="deleteUser(user)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm" (click)="editUser(user)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </nav>
-  
-      <!-- Main Content -->
-      <div class="col-md-10 offset-md-2 main-wrapper">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-custom">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center w-100">
-            <h1 class="h2 mb-0">Accueil</h1>
-            <div class="d-flex align-items-center w-100 justify-content-center">
-              <div class="input-group search-bar">
-                <input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Recherche par nom">
-                <div class="input-group-append">
-                  <span class="input-group-text"><i class="fas fa-search"></i></span>
-                </div>
-              </div>
-            </div>
-            <div class="admin-info ml-auto d-flex align-items-center">
-              <div class="admin-icon mr-2">
-                <i class="fas fa-user-circle fa-2x"></i>
-              </div>
-              <div class="admin-details">
-                <div class="admin-name">Kiné</div>
-                <div class="admin-role">Admin</div>
-              </div>
-            </div>
-          </div>
-        </nav>
-  
-        <main role="main" class="main-content">
-          <button type="button" class="btn btn-custom mb-3" (click)="addUser()">
-            <i class="fas fa-plus mr-2"></i> Ajouter un utilisateur
-          </button>
-  
-          <div class="table-responsive">
-            <table class="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>Photo</th>
-                  <th>Nom</th>
-                  <th>Email</th>
-                  <th>Rôle</th>
-                  <th>Téléphone</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let user of paginatedUsers">
-                  <td><img src="assets/user1.jpg" alt="{{ user.name }}" class="rounded-circle" width="30"></td>
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.role }}</td>
-                  <td>{{ user.phone }}</td>
-                  <td>
-                    <button class="btn btn-danger btn-sm mr-2" (click)="deleteUser(user)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn btn-success btn-sm" (click)="editUser(user)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-  
-          <!-- Pagination -->
-          <div class="pagination-container d-flex justify-content-center">
-            <nav>
-              <ul class="pagination">
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
-                </li>
-  
-                <li class="page-item" [class.active]="currentPage === (idx + 1)" *ngFor="let i of [].constructor(totalPages); let idx = index">
-                  <a class="page-link" href="javascript:void(0)" (click)="changePage(idx + 1)">{{ idx + 1 }}</a>
-                </li>
-  
-                <li class="page-item" [class.disabled]="currentPage === totalPages">
-                  <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </main>
-      </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container d-flex justify-content-center">
+          <nav>
+            <ul class="pagination">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
+              </li>
+
+              <li class="page-item" [class.active]="currentPage === (idx + 1)" *ngFor="let i of [].constructor(totalPages); let idx = index">
+                <a class="page-link" href="javascript:void(0)" (click)="changePage(idx + 1)">{{ idx + 1 }}</a>
+              </li>
+
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </main>
     </div>
   </div>
-  
+</div>

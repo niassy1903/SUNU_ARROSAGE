@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { Router } from '@angular/router';
 
 interface User {
   name: string;
@@ -14,9 +17,12 @@ interface User {
   templateUrl: './utilisateur.component.html',
   styleUrls: ['./utilisateur.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, SidebarComponent, NavbarComponent],
 })
 export class UtilisateurComponent implements OnInit {
+
+  constructor(private router: Router) {}
+
   users: User[] = [
     { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426930' },
     { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426931' },
@@ -84,6 +90,7 @@ export class UtilisateurComponent implements OnInit {
 
   addUser(): void {
     // Logic to add a new user
+    this.router.navigate(['/inscription']);
     console.log('Add user button clicked');
   }
 
