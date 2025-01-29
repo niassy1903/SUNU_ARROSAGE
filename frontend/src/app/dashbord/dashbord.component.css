@@ -1,0 +1,203 @@
+/* Général */
+.dashboard {
+    
+    background: #ffffff;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    margin-left: 300px;
+    margin-top: 50px;
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  
+  
+  /* Statistiques */
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .stat-box {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    border: solid 1px rgb(211, 203, 251);
+    transition: transform 0.3s ease;
+  }
+  
+
+  .stat-box:hover {
+    transform: translateY(-2px); /* Effet de soulèvement */
+}
+
+
+  .date-time {
+    font-size: 300px;
+    color: #000000;
+    font-weight: bold;
+    margin-right:50px ;
+  }
+  
+  .stat-title {
+    font-weight: bold;
+  
+  }
+  
+  .green {
+    color: #34d399;
+  }
+  
+  .yellow {
+    color: #facc15;
+  }
+  
+  .blue {
+    color: #3b82f6;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  /* État pompe */
+  .status {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .red-dot,
+  .green-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .red-dot {
+    background: red;
+  }
+  
+  .green-dot {
+    background: green;
+  }
+  
+  /* Graphiques */
+  .charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+   
+  }
+  
+  .chart {
+    background: #F9F9FA;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+
+  .chart:hover {
+    transform: translateY(-2px); /* Effet de soulèvement */
+}
+
+  
+  .chart h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .full-width {
+    grid-column: span 2;
+  }
+  .chart canvas {
+    max-height: 270px; /* Ajustez cette valeur selon vos besoins */
+    width: 100% !important; /* Assurez-vous que la largeur s'adapte */
+  }
+/*  image icone*/
+.stat-box {
+    position: relative; /* Pour le positionnement absolu de l'icône */
+    text-align: center;  /* Garde le texte centré */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: solid 1px rgb(211, 203, 251);
+  }
+  
+  .stat-icon {
+    position: absolute;
+    left: 45px; /* Distance depuis le bord gauche */
+    top: 50%; /* Centre vertical */
+    transform: translateY(-50%); /* Ajustement précis du centrage vertical */
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  
+  /* Les autres styles restent inchangés */
+  .date-time {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .stat-title {
+    font-weight: bold;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  #allume{
+margin-left: 260px;
+  }
+
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .dashboard {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr); /* Deux colonnes sur tablette */
+    }
+
+    .chart {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-container {
+        grid-template-columns: 1fr; /* Une seule colonne sur téléphone */
+    }
+
+    .chart canvas {
+        max-height: 200px; /* Réduction de la taille des graphiques */
+    }
+
+    .stat-title {
+        font-size: 14px; /* Ajustement des tailles de texte */
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+}

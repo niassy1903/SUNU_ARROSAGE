@@ -21,8 +21,10 @@
     "@angular/platform-server": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@angular/ssr": "^18.2.12",
+    "chart.js": "^4.4.7",
     "express": "^4.18.2",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^3.4.17",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
   },
