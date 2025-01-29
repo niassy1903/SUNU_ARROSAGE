@@ -27,7 +27,7 @@ export class DashbordComponent implements AfterViewInit {
         datasets: [{
           label: "Humidité",
           data: [10, 30, 20, 40, 15, 25,17],
-          backgroundColor: ["#a78bfa", "#34d399", "#1e3a8a", "#000", "#93c5fd", "#4ade80","E26169"]
+          backgroundColor: ["#a78bfa", "#34d399", "#1e3a8a", "#000", "#93c5fd", "#4ade80","#e26169"]
         }]
       }
     });
