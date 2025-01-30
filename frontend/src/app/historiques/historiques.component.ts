@@ -12,7 +12,7 @@ import { SidebarComponent } from "../sidebar/sidebar.component";
 })
 export class HistoriquesComponent {
   historiques = [
-    { photo: 'null', prenom: 'Mark', nom: 'Otto', actions: 'crud' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
+    { photo: 'profil.png', prenom: 'Mark', nom: 'Otto', actions: 'crud' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
     { photo: 'null', prenom: 'Jacob', nom: 'Thornton', actions: 'arrosage automatique' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
     { photo: 'null', prenom: 'Larry', nom: 'the Bird', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
     { photo: 'null', prenom: 'Mark', nom: 'Otto', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },

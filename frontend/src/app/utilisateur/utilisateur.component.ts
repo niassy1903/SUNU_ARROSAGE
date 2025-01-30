@@ -1,15 +1,26 @@
+// src/app/utilisateur/utilisateur.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { Router } from '@angular/router';
+import { UtilisateurService } from '../utilisateur.service';
+import { HttpClientModule } from '@angular/common/http';
+
+declare var $: any;
 
 interface User {
-  name: string;
-  email: string;
+  _id: string;
+  nom: string;
+  prenom: string;
   role: string;
-  phone: string;
+  telephone: string;
+  adresse: string;
+  carte_rfid: string;
+  matricule: string;
+  code_secret: string;
 }
 
 @Component({
@@ -17,62 +28,40 @@ interface User {
   templateUrl: './utilisateur.component.html',
   styleUrls: ['./utilisateur.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, NavbarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, NavbarComponent, HttpClientModule],
+  providers: [UtilisateurService]
 })
 export class UtilisateurComponent implements OnInit {
-
-  constructor(private router: Router) {}
-
-  users: User[] = [
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426930' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426931' },
-    { name: 'Derrick Spencer', email: 'niass@gmail.com', role: 'keur massar', phone: '778426932' },
-    { name: 'Larissa Burton', email: 'patric@gmail.com', role: 'maristes', phone: '778426933' },
-    { name: 'Nicholas Patrick', email: 'test@gmail.com', role: 'pikine', phone: '778426934' },
-    { name: 'Nicholas Patrick', email: 'yes@gmail.com', role: 'liberte6', phone: '778426935' },
-    { name: 'Nicholas Patrick', email: 'nicks87@gmail.com', role: 'ouakam', phone: '778426936' },
-    { name: 'Cordell Edwards', email: 'cordell@gmail.com', role: 'yoff', phone: '778426937' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426938' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426939' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426930' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426931' },
-    { name: 'Derrick Spencer', email: 'niass@gmail.com', role: 'keur massar', phone: '778426932' },
-    { name: 'Larissa Burton', email: 'patric@gmail.com', role: 'maristes', phone: '778426933' },
-    { name: 'Nicholas Patrick', email: 'test@gmail.com', role: 'pikine', phone: '778426934' },
-    { name: 'Nicholas Patrick', email: 'yes@gmail.com', role: 'liberte6', phone: '778426935' },
-    { name: 'Nicholas Patrick', email: 'nicks87@gmail.com', role: 'ouakam', phone: '778426936' },
-    { name: 'Cordell Edwards', email: 'cordell@gmail.com', role: 'yoff', phone: '778426937' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426938' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426939' },
-    { name: 'Nicholas Patrick', email: 'yes@gmail.com', role: 'liberte6', phone: '778426935' },
-    { name: 'Nicholas Patrick', email: 'nicks87@gmail.com', role: 'ouakam', phone: '778426936' },
-    { name: 'Cordell Edwards', email: 'cordell@gmail.com', role: 'yoff', phone: '778426937' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426938' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426939' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426930' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426931' },
-    { name: 'Derrick Spencer', email: 'niass@gmail.com', role: 'keur massar', phone: '778426932' },
-    { name: 'Larissa Burton', email: 'patric@gmail.com', role: 'maristes', phone: '778426933' },
-    { name: 'Nicholas Patrick', email: 'test@gmail.com', role: 'pikine', phone: '778426934' },
-    { name: 'Nicholas Patrick', email: 'yes@gmail.com', role: 'liberte6', phone: '778426935' },
-    { name: 'Nicholas Patrick', email: 'nicks87@gmail.com', role: 'ouakam', phone: '778426936' },
-    { name: 'Cordell Edwards', email: 'cordell@gmail.com', role: 'yoff', phone: '778426937' },
-    { name: 'Nicholas Patrick', email: 'patrick@gmail.com', role: 'thiaroye', phone: '778426938' },
-    { name: 'Cordell Edwards', email: 'kine@gmail.com', role: 'medina', phone: '778426939' }
-  ];
+  users: User[] = [];
   paginatedUsers: User[] = [];
   searchTerm: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 13;
   totalPages: number = 0;
+  userToDelete: User | null = null;
+
+  constructor(private router: Router, private utilisateurService: UtilisateurService) {}
 
   ngOnInit(): void {
-    this.filterAndPaginateUsers();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.utilisateurService.listUtilisateurs().subscribe(
+      (response) => {
+        this.users = response.utilisateurs;
+        this.filterAndPaginateUsers();
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des utilisateurs', error);
+      }
+    );
   }
 
   filterAndPaginateUsers(): void {
     let filteredUsers = this.users.filter(user =>
-      user.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      user.nom.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      user.prenom.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
     this.totalPages = Math.ceil(filteredUsers.length / this.itemsPerPage);
     this.paginatedUsers = filteredUsers.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage);
@@ -89,18 +78,30 @@ export class UtilisateurComponent implements OnInit {
   }
 
   addUser(): void {
-    // Logic to add a new user
     this.router.navigate(['/inscription']);
-    console.log('Add user button clicked');
   }
 
-  deleteUser(user: User): void {
-    // Logic to delete a user
-    console.log('Delete user button clicked for user:', user);
+  confirmDelete(user: User): void {
+    this.userToDelete = user;
+    $('#deleteConfirmationModal').modal('show');
+  }
+
+  deleteUser(): void {
+    if (this.userToDelete) {
+      this.utilisateurService.deleteUtilisateur(this.userToDelete._id).subscribe(
+        (response) => {
+          console.log('Utilisateur supprimé avec succès', response);
+          $('#deleteConfirmationModal').modal('hide');
+          this.loadUsers(); // Rafraîchir la liste des utilisateurs
+        },
+        (error) => {
+          console.error('Erreur lors de la suppression de l\'utilisateur', error);
+        }
+      );
+    }
   }
 
   editUser(user: User): void {
-    // Logic to edit a user
-    console.log('Edit user button clicked for user:', user);
+    this.router.navigate(['/edit', user._id]);
   }
 }

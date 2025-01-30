@@ -23,7 +23,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let historique of paginatedHistorique">
-                <td>{{ historique.photo }}</td>
+                <td><img src="profil.png" alt="{{ historique.nom }} {{ historique.prenom }}" class="rounded-circle" width="30"></td>
                 <td>{{ historique.prenom }}</td>
                 <td>{{ historique.nom }}</td>
                 <td>{{ historique.actions }}</td>

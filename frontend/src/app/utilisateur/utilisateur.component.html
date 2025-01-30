@@ -1,3 +1,5 @@
+<!-- src/app/utilisateur/utilisateur.component.html -->
+
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar -->
@@ -18,8 +20,9 @@
             <thead>
               <tr>
                 <th>Photo</th>
+                <th>Matricule</th>
                 <th>Nom</th>
-                <th>Email</th>
+                <th>Prénom</th>
                 <th>Rôle</th>
                 <th>Téléphone</th>
                 <th>Actions</th>
@@ -27,13 +30,14 @@
             </thead>
             <tbody>
               <tr *ngFor="let user of paginatedUsers">
-                <td><img src="assets/user1.jpg" alt="{{ user.name }}" class="rounded-circle" width="30"></td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
+                <td><img src="profil.png" alt="{{ user.nom }} {{ user.prenom }}" class="rounded-circle" width="30"></td>
+                <td>{{ user.matricule }}</td>
+                <td>{{ user.nom }}</td>
+                <td>{{ user.prenom }}</td>
                 <td>{{ user.role }}</td>
-                <td>{{ user.phone }}</td>
+                <td>{{ user.telephone }}</td>
                 <td>
-                  <button class="btn btn-danger btn-sm mr-2" (click)="deleteUser(user)">
+                  <button class="btn btn-danger btn-sm mr-2" (click)="confirmDelete(user)">
                     <i class="fas fa-trash"></i>
                   </button>
                   <button class="btn btn-success btn-sm" (click)="editUser(user)">
@@ -64,6 +68,27 @@
           </nav>
         </div>
       </main>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="deleteUser()">Supprimer</button>
+      </div>
     </div>
   </div>
 </div>

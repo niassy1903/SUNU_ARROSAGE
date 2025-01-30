@@ -17,3 +17,21 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+// routes/api.php
+
+use App\Http\Controllers\UtilisateurController;
+
+// routes/api.php
+
+use App\Http\Controllers\UtilisateursController;
+
+Route::post('/utilisateurs', [UtilisateurController::class, 'create']);
+Route::get('/utilisateurs/{id}', [UtilisateurController::class, 'getUtilisateur']);
+Route::get('/utilisateurs', [UtilisateurController::class, 'list']);
+Route::delete('/utilisateurs/{id}', [UtilisateurController::class, 'delete']);
+Route::delete('/utilisateurs', [UtilisateurController::class, 'deleteMultiple']);
+Route::put('/utilisateurs/{id}', [UtilisateurController::class, 'update']);
+Route::get('/utilisateurs/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
+Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController::class, 'checkCarteRfidExists']);
