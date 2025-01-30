@@ -19,7 +19,9 @@
             [id]="'code-' + i"
             (input)="onCodeInput($event, i)"
             (keydown)="onKeyDown($event, i)"
-            [(ngModel)]="codeDigits[i]">
+            [(ngModel)]="maskedDigits[i]">
+
+            
         </div>
       </div>
 
