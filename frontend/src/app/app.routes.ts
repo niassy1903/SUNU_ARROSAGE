@@ -17,5 +17,6 @@ export const routes: Routes = [
     {path: 'historiques',component: HistoriquesComponent},
     {path: 'dashbord',component: DashbordComponent},
     {path: 'edit/:id', component: EditComponent},
+    { path: '', redirectTo: 'loginbycode', pathMatch: 'full' },
     {path: 'loginbycode', component: LoginbycodeComponent},
 ];
