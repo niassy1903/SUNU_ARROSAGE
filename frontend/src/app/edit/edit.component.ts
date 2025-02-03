@@ -74,7 +74,7 @@ export class EditComponent implements OnInit {
       (response) => {
         console.log('Utilisateur mis à jour avec succès', response);
         $('#updateConfirmationModal').modal('hide');
-        this.router.navigate(['/utilisateurs']);
+        this.router.navigate(['/utilisateur']);
       },
       (error) => {
         console.error('Erreur lors de la mise à jour de l\'utilisateur', error);

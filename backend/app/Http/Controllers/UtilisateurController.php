@@ -15,7 +15,7 @@ class UtilisateurController extends Controller
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'role' => 'required|in:admin_simple,super_admin',
-            'telephone' => 'required|string|max:20|unique:utilisateurs|regex:/^(70|77|76|75|78)\d{6}$/',
+            'telephone' => 'required|string|max:20|unique:utilisateurs',
             'adresse' => 'required|string|max:255',
             'carte_rfid' => 'required|string|max:255|unique:utilisateurs',
         ]);

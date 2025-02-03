@@ -21,6 +21,7 @@
               <tr>
                 <th>Photo</th>
                 <th>Matricule</th>
+                <th>Code Secret</th>
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>Rôle</th>
@@ -32,6 +33,7 @@
               <tr *ngFor="let user of paginatedUsers">
                 <td><img src="profil.png" alt="{{ user.nom }} {{ user.prenom }}" class="rounded-circle" width="30"></td>
                 <td>{{ user.matricule }}</td>
+                <td>{{ user.code_secret }}</td>
                 <td>{{ user.nom }}</td>
                 <td>{{ user.prenom }}</td>
                 <td>{{ user.role }}</td>

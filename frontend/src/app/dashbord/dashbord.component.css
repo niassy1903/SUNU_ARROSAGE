@@ -134,7 +134,7 @@
 }
 
 .chart canvas {
-  max-height: 270px; /* Ajustez cette valeur selon vos besoins */
+  max-height: 250px; /* Ajustez cette valeur selon vos besoins */
   width: 100% !important; /* Assurez-vous que la largeur s'adapte */
 }
 
@@ -170,5 +170,175 @@
 
   .stat-value {
     font-size: 18px;
+  }
+
+
+.stat-icon {
+  position: absolute;
+  
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+}
+
+/*planificaton horaire*/
+/* Modifications pour la planification */
+/* Container principal de la planification */
+.planning-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+/* Style pour la partie gauche (planification) */
+.planning-left {
+  width: 45%;
+}
+
+/* Style pour la partie droite (horaires planifiés) */
+.planning-right {
+  width: 45%;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+
+}
+
+.planning-title {
+  color: #34d399;
+  font-weight: 500;
+ 
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+ 
+}
+
+.time-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #34d399;
+  border-radius: 5px;
+  color: #34d399;
+  text-align: center;
+}
+
+.plan-actions {
+  display: flex;
+  gap: 10px;
+ 
+}
+
+.validate-button, .cancel-button {
+  width: 100px;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.validate-button {
+  background-color: #34d399;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #f87171;
+  color: white;
+}
+
+.planning-list-title {
+  color: #34d399;
+  font-weight: 700;
+  margin-left: 80px;
+  margin-bottom: 10px;
+}
+
+.scheduled-times {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+ 
+  padding: 5px 0;
+}
+.countdown {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.next-watering {
+  color: #34d399;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.countdown-time {
+  color: #34d399;
+  font-size: 24px;
+  font-weight: bold;
+}
+.scheduled-times {
+  display: flex;
+  flex-direction: column;  /* Les éléments s'afficheront verticalement */
+}
+
+.scheduled-time {
+  font-size: 16px;  /* Taille de police */
+  padding: 5px;  /* Padding pour rendre les éléments plus espacés */
+  background-color: #f1f1f1;  /* Optionnel : couleur de fond */
+  border-radius: 5px;  /* Optionnel : bordure arrondie */
+}
+
+
+/*bouton supprimer*/
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red; /* Couleur de la croix */
+   /* Grande taille pour l'icône croix */
+  transition: color 0.3s ease;
+}
+
+.delete-button i {
+ 
+  font-size: 10px; /* Taille spécifique de l'icône croix */
+  color: red; /* Initialement rouge */
+  transition: transform 0.3s ease;
+}
+
+.delete-button:hover i {
+  transform: scale(1.2); /* Agrandir légèrement l'icône lors du survol */
+  color: darkred; /* Couleur lors du survol */
+}
+/*partie decompte*/
+.countdown {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.countdown.alert {
+  background-color: #ff4444;
+  color: white;
+  animation: blink 1s infinite;
+}
+
+.next-watering {
+  font-size: 1rem;
+  margin: 0;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.5;
   }
 }
