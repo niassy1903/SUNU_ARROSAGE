@@ -10,12 +10,15 @@
           Dashboard
         </a>
       </li>
-      <li class="nav-item">
+
+      <!-- Afficher "Gestion Utilisateurs" uniquement si le rôle est "super_admin" -->
+      <li class="nav-item" *ngIf="isSuperAdmin()">
         <a class="nav-link" href="../utilisateur/" routerLinkActive="active">
           <i class="fas fa-users"></i>
           Gestion Utilisateurs
         </a>
       </li>
+
       <li class="nav-item">
         <a class="nav-link" href="../historiques/" routerLinkActive="active">
           <i class="fas fa-history"></i>

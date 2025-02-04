@@ -1,11 +1,13 @@
 <?php
-// app/Http/Controllers/UtilisateursController.php
+// app/Http/Controllers/UtilisateurController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
+//use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UtilisateurController extends Controller
 {
@@ -15,7 +17,7 @@ class UtilisateurController extends Controller
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'role' => 'required|in:admin_simple,super_admin',
-            'telephone' => 'required|string|max:20|unique:utilisateurs|regex:/^(70|77|76|75|78)\d{6}$/',
+            'telephone' => 'required|string|max:20|unique:utilisateurs',
             'adresse' => 'required|string|max:255',
             'carte_rfid' => 'required|string|max:255|unique:utilisateurs',
         ]);
@@ -128,6 +130,68 @@ class UtilisateurController extends Controller
 
     private function generateCodeSecret()
     {
-        return str_pad(mt_rand(0, 99999), 5, '0', STR_PAD_LEFT);
+        return str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
     }
+
+    public function loginByCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code_secret' => 'required|numeric|digits:4',  // Validation du code secret :chiffre uniquement avec longueur 4
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+    
+        $code_secret = $request->input('code_secret');
+        $utilisateur = Utilisateur::where('code_secret', $code_secret)->first();
+    
+        if ($utilisateur) {
+            // Générer un token JWT pour l'utilisateur
+            $token = JWTAuth::fromUser($utilisateur);
+            
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'token' => $token,
+                'user' => [
+                    'nom' => $utilisateur->nom,
+                    'prenom' => $utilisateur->prenom,
+                    'role' => $utilisateur->role
+                ]
+            ], 201);
+        } else {
+            return response()->json(['error' => 'Code incorrect'], 401);
+        }
+    }
+    
+
+    public function logout(Request $request)
+    {
+        $token = $request->bearerToken();
+    
+        if (!$token) {
+            return response()->json(['error' => 'Token non fourni'], 400);
+        }
+    
+        try {
+            // Optionnel : vérifier si le token est valide avant d'invalider
+            $tokenPayload = JWTAuth::setToken($token)->getPayload();
+    
+            if ($tokenPayload) {
+                JWTAuth::invalidate($token);
+                return response()->json(['message' => 'Déconnexion réussie'], 200);
+            }
+    
+            return response()->json(['error' => 'Token invalide ou expiré'], 401);
+            
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['error' => 'Le token est déjà expiré'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['error' => 'Token invalide'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['error' => 'Impossible d\'invalider le token'], 500);
+        }
+    }
+    
+
 }

@@ -1,32 +1,62 @@
 <div class="login-container">
-    <div class="login-card">
-     
+  <div class="login-card">
+    <div class="auth-section">
+      <!-- Section du logo -->
+      <div class="logo-section">
+        <img src="/images/GPIO_raspberry.png" alt="SUNU ARROSAGE" class="logo">
+        <h1 class="brand-name">SUNU ARROSAGE</h1>
+      </div>
       
-      <div class="auth-section">
-        <div class="logo-section">
-          <img src="/images/GPIO_raspberry.png" alt="SUNU ARROSAGE" class="logo">
-          <h1 class="brand-name">SUNU ARROSAGE</h1>
+      <!-- Bloc de blocage avec minuterie - affiché uniquement quand le compte est bloqué -->
+      <div *ngIf="isBlocked" class="block-timer-section">
+        <!-- Message de blocage -->
+        <div class="block-message">
+          Trop de tentatives. Compte bloqué pendant {{ remainingBlockTime }} secondes.
         </div>
+        <!-- Conteneur de la minuterie -->
+        <div class="countdown-container">
+          <!-- Barre de progression qui se réduit -->
+          <div 
+            class="countdown-progress" 
+            [style.width.%]="countdownProgress"
+          ></div>
+          <!-- Affichage du temps restant -->
+          <div class="countdown-time">
+            {{ remainingBlockTime }} s
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section d'authentification - affichée quand le compte n'est pas bloqué -->
+      <ng-container *ngIf="!isBlocked">
+        <!-- Instructions de connexion -->
         <p class="auth-text">Veuillez vous authentifier par code en saisissant votre code d'accès</p>
         <p class="rfid-text">ou par carte RFID : Approchez votre carte du lecteur</p>
         
-        <div class="code-input-container">
-          <input 
+        <!-- Conteneur des inputs de code -->
+        <div class="code-input-container" [ngClass]="{'shake': shakeInputs}">
+          <!-- Génération dynamique des 4 inputs -->
+          <input
             *ngFor="let _ of [1,2,3,4]; let i = index"
-            type="text" 
+            #codeInput
+            type="text"
             maxlength="1"
             class="code-input"
             [id]="'code-' + i"
+            [ngClass]="{'error': inputError}"
             (input)="onCodeInput($event, i)"
             (keydown)="onKeyDown($event, i)"
             [(ngModel)]="maskedDigits[i]">
-
-            
         </div>
-      </div>
-
-      <div class="welcome-section">
-        <h2 class="welcome-text">Bienvenue sur le système<br>d'arrosage automatique</h2>
-      </div>
+        
+        <!-- Affichage conditionnel du message d'erreur -->
+        <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+      </ng-container>
+    </div>
+    
+    <!-- Section de bienvenue -->
+    <div class="welcome-section">
+      <h2 class="welcome-text">Bienvenue sur le système<br>d'arrosage automatique</h2>
     </div>
   </div>
+</div>
