@@ -66,3 +66,54 @@ body {
   height: 100px;
   object-fit: cover;
 }
+
+
+  /* Styles pour les boutons */
+  .actions .btn {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .actions .btn i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+  }
+  
+  /* Styles pour les modals */
+  .modal-content {
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #dee2e6;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .modal-body img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .modal-body h5 {
+    margin-top: 15px;
+  }
+  
+  .modal-body p {
+    margin: 5px 0;
+  }
+  
+  /* Styles pour les messages d'erreur */
+  .text-danger {
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
+  

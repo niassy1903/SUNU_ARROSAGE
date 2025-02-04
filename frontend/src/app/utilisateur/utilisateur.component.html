@@ -1,5 +1,3 @@
-<!-- src/app/utilisateur/utilisateur.component.html -->
-
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar -->
@@ -8,11 +6,11 @@
     <!-- Main Content -->
     <div class="col-md-10 offset-md-2 main-wrapper">
       <!-- Navbar -->
-      <app-navbar [searchTerm]="searchTerm"></app-navbar>
+      <app-navbar></app-navbar>
 
       <main role="main" class="main-content">
         <button type="button" class="btn btn-custom mb-3" (click)="addUser()">
-          <i class="fas fa-plus mr-2"></i> Ajouter un utilisateur
+          <i class="bi bi-plus-lg mr-2"></i> Ajouter un utilisateur
         </button>
 
         <div class="table-responsive">
@@ -38,10 +36,16 @@
                 <td>{{ user.telephone }}</td>
                 <td>
                   <button class="btn btn-danger btn-sm mr-2" (click)="confirmDelete(user)">
-                    <i class="fas fa-trash"></i>
+                    <i class="bi bi-trash"></i>
                   </button>
-                  <button class="btn btn-success btn-sm" (click)="editUser(user)">
-                    <i class="fas fa-edit"></i>
+                  <button class="btn btn-success btn-sm mr-2" (click)="editUser(user)">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-primary btn-sm mr-2" (click)="openProfileModal(user)">
+                    <i class="bi bi-person-circle"></i>
+                  </button>
+                  <button class="btn btn-secondary btn-sm" (click)="openAssignCardModal(user)">
+                    <i class="bi bi-credit-card-2-back"></i>
                   </button>
                 </td>
               </tr>
@@ -88,6 +92,53 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
         <button type="button" class="btn btn-danger" (click)="deleteUser()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour assigner une carte -->
+<div class="modal fade" id="assignCardModal" tabindex="-1" aria-labelledby="assignCardModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assignCardModalLabel">Assigner une Carte</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Placer la carte sur le capteur RDId pour lui assigner une carte</p>
+        <input type="text" class="form-control" id="carte_rfid_modal" placeholder="Carte RFID" [(ngModel)]="carte_rfid_modal" name="carte_rfid_modal" required>
+        <div *ngIf="carteRfidModalError" class="text-danger">{{ carteRfidModalError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" (click)="assignCard()">Assigner</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour voir le profil -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">Profil Utilisateur</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="profil.png" alt="User Photo" class="rounded-circle img-thumbnail mb-3">
+        <h5>{{ selectedUser?.nom }} {{ selectedUser?.prenom }}</h5>
+        <p>Téléphone: {{ selectedUser?.telephone }}</p>
+        <p>Adresse: {{ selectedUser?.adresse }}</p>
+        <p>Code Secret: {{ selectedUser?.code_secret }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
       </div>
     </div>
   </div>

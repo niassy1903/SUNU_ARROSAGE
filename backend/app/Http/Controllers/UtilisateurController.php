@@ -7,6 +7,9 @@ use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Notifications\CodeSecretNotification;
+use Illuminate\Support\Facades\Notification;
+
 //use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UtilisateurController extends Controller
@@ -19,7 +22,8 @@ class UtilisateurController extends Controller
             'role' => 'required|in:admin_simple,super_admin',
             'telephone' => 'required|string|max:20|unique:utilisateurs',
             'adresse' => 'required|string|max:255',
-            'carte_rfid' => 'required|string|max:255|unique:utilisateurs',
+            'carte_rfid' => 'nullable|string|max:255|unique:utilisateurs',
+            'email' => 'required|email|unique:utilisateurs',
         ]);
 
         if ($validator->fails()) {
@@ -38,7 +42,11 @@ class UtilisateurController extends Controller
             'role' => $request->role,
             'telephone' => $request->telephone,
             'adresse' => $request->adresse,
+            'email' => $request->email,
         ]);
+
+        // Envoyer l'email avec le code secret
+        Notification::send($utilisateur, new CodeSecretNotification($code_secret, $request->nom, $request->prenom));
 
         return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
     }
@@ -82,23 +90,42 @@ class UtilisateurController extends Controller
         if (!$utilisateur) {
             return response()->json(['error' => 'Utilisateur non trouvé'], 404);
         }
-
-        $validator = Validator::make($request->all(), [
-            'nom' => 'sometimes|required|string|max:255',
-            'prenom' => 'sometimes|required|string|max:255',
-            'role' => 'sometimes|required|in:admin_simple,super_admin',
-            'telephone' => 'sometimes|required|string|max:20|unique:utilisateurs,telephone,' . $id,
-            'adresse' => 'sometimes|required|string|max:255',
-            'carte_rfid' => 'sometimes|required|string|max:255|unique:utilisateurs,carte_rfid,' . $id,
-        ]);
-
+    
+        $rules = [
+            'nom' => 'sometimes|string|max:255',
+            'prenom' => 'sometimes|string|max:255',
+            'role' => 'sometimes|in:admin_simple,super_admin',
+            'adresse' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email',
+        ];
+    
+        // Vérifier si les champs ont été envoyés avant d'appliquer la validation unique
+        if ($request->has('email') && $request->email !== $utilisateur->email) {
+            $rules['email'] = 'email|unique:utilisateurs,email,' . $id;
+        }
+    
+        if ($request->has('telephone') && $request->telephone !== $utilisateur->telephone) {
+            $rules['telephone'] = 'string|max:20|unique:utilisateurs,telephone,' . $id;
+        }
+    
+        if ($request->has('carte_rfid') && $request->carte_rfid !== $utilisateur->carte_rfid) {
+            $rules['carte_rfid'] = 'string|max:255|unique:utilisateurs,carte_rfid,' . $id;
+        }
+    
+        $validator = Validator::make($request->all(), $rules);
+    
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
-
-        $utilisateur->update($request->only(['nom', 'prenom', 'role', 'telephone', 'adresse', 'carte_rfid']));
-        return response()->json(['message' => 'Utilisateur mis à jour avec succès', 'utilisateur' => $utilisateur], 200);
+    
+        $utilisateur->update($request->only(array_keys($rules)));
+    
+        return response()->json([
+            'message' => 'Utilisateur mis à jour avec succès',
+            'utilisateur' => $utilisateur
+        ], 200);
     }
+    
 
     public function getUtilisateur($id)
     {

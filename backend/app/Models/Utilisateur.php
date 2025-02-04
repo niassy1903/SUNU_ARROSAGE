@@ -4,9 +4,12 @@ namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 
 class Utilisateur extends Model implements JWTSubject
 {
+    use Notifiable;
+
     protected $connection = 'mongodb';
     protected $collection = 'utilisateurs';
 
@@ -19,6 +22,7 @@ class Utilisateur extends Model implements JWTSubject
         'role',
         'telephone',
         'adresse',
+        'email',
     ];
 
     // Méthode pour obtenir l'identifiant JWT
@@ -31,5 +35,11 @@ class Utilisateur extends Model implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    // Méthode pour obtenir l'adresse email pour les notifications
+    public function routeNotificationForMail()
+    {
+        return $this->email;
     }
 }
