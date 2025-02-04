@@ -1,5 +1,3 @@
-// src/app/utilisateur/utilisateur.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +6,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { Router } from '@angular/router';
 import { UtilisateurService } from '../utilisateur.service';
 import { HttpClientModule } from '@angular/common/http';
+import { JwtService } from '../jwt.service';
 
 declare var $: any;
 
@@ -29,7 +28,7 @@ interface User {
   styleUrls: ['./utilisateur.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule, SidebarComponent, NavbarComponent, HttpClientModule],
-  providers: [UtilisateurService]
+  providers: [UtilisateurService, JwtService],
 })
 export class UtilisateurComponent implements OnInit {
   users: User[] = [];
@@ -39,6 +38,9 @@ export class UtilisateurComponent implements OnInit {
   itemsPerPage: number = 13;
   totalPages: number = 0;
   userToDelete: User | null = null;
+  selectedUser: User | null = null;
+  carte_rfid_modal: string = '';
+  carteRfidModalError: string = '';
 
   constructor(private router: Router, private utilisateurService: UtilisateurService) {}
 
@@ -103,5 +105,35 @@ export class UtilisateurComponent implements OnInit {
 
   editUser(user: User): void {
     this.router.navigate(['/edit', user._id]);
+  }
+
+  openProfileModal(user: User): void {
+    this.selectedUser = user;
+    $('#profileModal').modal('show');
+  }
+
+  openAssignCardModal(user: User): void {
+    this.selectedUser = user;
+    $('#assignCardModal').modal('show');
+  }
+
+  assignCard(): void {
+    if (!this.carte_rfid_modal) {
+      this.carteRfidModalError = 'La carte RFID est requise.';
+      return;
+    }
+    if (this.selectedUser) {
+      this.selectedUser.carte_rfid = this.carte_rfid_modal;
+      this.utilisateurService.updateUtilisateur(this.selectedUser._id, this.selectedUser).subscribe(
+        (response) => {
+          console.log('Carte RFID assignée avec succès', response);
+          $('#assignCardModal').modal('hide');
+          this.loadUsers(); // Rafraîchir la liste des utilisateurs
+        },
+        (error) => {
+          console.error('Erreur lors de l\'assignation de la carte RFID', error);
+        }
+      );
+    }
   }
 }

@@ -41,7 +41,7 @@
   
   .dropdown-menu {
     position: absolute;
-    left: -100px;
+    left: -12px;
     top: calc(100% + 10px); /* Position below the admin-name with some space */
     margin-top: 0; /* Remove default margin */
     background-color: #fff;

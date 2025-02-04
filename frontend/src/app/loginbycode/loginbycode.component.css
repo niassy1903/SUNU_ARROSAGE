@@ -1,9 +1,11 @@
+
 .login-container {
-    height: 90vh;
+    height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 30px;
+      background-color: #D0F0E5;
     }
   
     .login-card {
@@ -94,7 +96,12 @@
         font-size: 18px;
       }
   
-      
-  
-  
-    }
+  }
+
+/* src/app/loginbycode/loginbycode.component.css */
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}

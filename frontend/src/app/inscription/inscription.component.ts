@@ -12,10 +12,10 @@ declare var $: any;
 interface User {
   nom: string;
   prenom: string;
+  email: string;
   role: string;
   telephone: string;
   adresse: string;
-  carte_rfid: string;
 }
 
 @Component({
@@ -27,14 +27,13 @@ interface User {
   providers: [UtilisateurService],
 })
 export class InscriptionComponent {
-  prenom: string = '';
   nom: string = '';
+  prenom: string = '';
+  email: string = '';
   role: string = 'admin_simple';
   telephone: string = '';
   adresse: string = '';
-  carte_rfid: string = '';
   telephoneError: string = '';
-  carteRfidError: string = '';
 
   constructor(private utilisateurService: UtilisateurService, private router: Router) {}
 
@@ -47,23 +46,14 @@ export class InscriptionComponent {
     }
   }
 
-  validateCarteRfid() {
-    // Ajoutez ici la logique de validation pour la carte RFID si nécessaire
-    if (!this.carte_rfid) {
-      this.carteRfidError = 'La carte RFID est requise.';
-    } else {
-      this.carteRfidError = '';
-    }
-  }
-
   onSubmit() {
     const utilisateur: User = {
       nom: this.nom,
       prenom: this.prenom,
+      email: this.email,
       role: this.role,
       telephone: this.telephone,
       adresse: this.adresse,
-      carte_rfid: this.carte_rfid
     };
 
     this.utilisateurService.createUtilisateur(utilisateur).subscribe(

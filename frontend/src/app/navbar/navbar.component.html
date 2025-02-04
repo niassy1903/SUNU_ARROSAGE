@@ -1,33 +1,32 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-custom">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center w-100">
-      <h1 class="h2 mb-0">Accueil</h1>
-      <div class="d-flex align-items-center w-100 justify-content-center">
-        <div class="input-group search-bar">
-          <input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Recherche par nom">
-          <div class="input-group-append">
-            <span class="input-group-text"><i class="fas fa-search"></i></span>
-          </div>
-        </div>
-      </div>
-      <div class="admin-info ml-auto d-flex align-items-center position-relative">
-        <div class="admin-icon mr-2">
-          <i class="fas fa-user-circle fa-2x"></i>
-        </div>
-        <div class="admin-details dropdown">
-          <div class="admin-name dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Kiné
-          </div>
-          <div class="admin-role">Admin</div>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-user-edit mr-2"></i> Modifier profil
-            </a>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
-            </a>
-          </div>
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center w-100">
+    <h1 class="h2 mb-0">Accueil</h1>
+    <div class="d-flex align-items-center w-100 justify-content-center">
+      <div class="input-group search-bar">
+        <input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Recherche par nom">
+        <div class="input-group-append">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
         </div>
       </div>
     </div>
-  </nav>
-  
+    <div class="admin-info ml-auto d-flex align-items-center position-relative">
+      <div class="admin-icon mr-2">
+        <i class="fas fa-user-circle fa-2x"></i>
+      </div>
+      <div class="admin-details dropdown">
+        <div class="admin-name dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ userPrenom }} {{ userName }} <!-- Afficher le prénom et le nom -->
+        </div>
+        <div class="admin-role">{{ userRole }}</div>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">
+            <i class="fas fa-user-edit mr-2"></i> Modifier profil
+          </a>
+          <a class="dropdown-item" (click)="logout()">
+            <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

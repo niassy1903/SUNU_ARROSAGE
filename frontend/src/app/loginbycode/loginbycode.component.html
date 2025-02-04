@@ -1,32 +1,32 @@
 <div class="login-container">
-    <div class="login-card">
-     
-      
-      <div class="auth-section">
-        <div class="logo-section">
-          <img src="/images/GPIO_raspberry.png" alt="SUNU ARROSAGE" class="logo">
-          <h1 class="brand-name">SUNU ARROSAGE</h1>
-        </div>
-        <p class="auth-text">Veuillez vous authentifier par code en saisissant votre code d'accès</p>
-        <p class="rfid-text">ou par carte RFID : Approchez votre carte du lecteur</p>
-        
-        <div class="code-input-container">
-          <input 
-            *ngFor="let _ of [1,2,3,4]; let i = index"
-            type="text" 
-            maxlength="1"
-            class="code-input"
-            [id]="'code-' + i"
-            (input)="onCodeInput($event, i)"
-            (keydown)="onKeyDown($event, i)"
-            [(ngModel)]="maskedDigits[i]">
+  <div class="login-card">
+    <div class="auth-section">
+      <div class="logo-section">
+        <img src="/images/GPIO_raspberry.png" alt="SUNU ARROSAGE" class="logo">
+        <h1 class="brand-name">SUNU ARROSAGE</h1>
+      </div>
+      <p class="auth-text">Veuillez vous authentifier par code en saisissant votre code d'accès</p>
+      <p class="rfid-text">ou par carte RFID : Approchez votre carte du lecteur</p>
 
-            
-        </div>
+      <div class="code-input-container">
+        <input
+          *ngFor="let _ of [1,2,3,4]; let i = index"
+          type="text"
+          maxlength="1"
+          class="code-input"
+          [id]="'code-' + i"
+          (input)="onCodeInput($event, i)"
+          (keydown)="onKeyDown($event, i)"
+          [(ngModel)]="maskedDigits[i]">
       </div>
 
-      <div class="welcome-section">
-        <h2 class="welcome-text">Bienvenue sur le système<br>d'arrosage automatique</h2>
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
       </div>
     </div>
+
+    <div class="welcome-section">
+      <h2 class="welcome-text">Bienvenue sur le système<br>d'arrosage automatique</h2>
+    </div>
   </div>
+</div>
