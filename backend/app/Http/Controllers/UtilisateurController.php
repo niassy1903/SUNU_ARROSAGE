@@ -136,7 +136,7 @@ class UtilisateurController extends Controller
     public function loginByCode(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code_secret' => 'required|numeric|digits:4',  // Validation du code secret :chiffre uniquement avec longueur 4
+            'code_secret' => 'required|numeric|digits:4',  
         ]);
     
         if ($validator->fails()) {

@@ -44,7 +44,7 @@ export class UtilisateurService {
 
    // Connexion par code secret
    loginByCode(codeSecret: string): Observable<{ token: string, user: { prenom: string, nom: string, role: string } }> {
-    return this.http.post<{ token: string, user: { nom: string, prenom: string, role: string } }>(
+    return this.http.post<{ token: string, user: { prenom: string, nom: string, role: string } }>(
       `${this.apiUrl1}/login-by-code`, 
       { code_secret: codeSecret }
     ).pipe(

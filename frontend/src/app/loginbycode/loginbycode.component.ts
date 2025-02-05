@@ -7,11 +7,11 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   // Configuration du composant Angular
-  selector: 'app-loginbycode',   // Sélecteur HTML pour utiliser ce composant
-  standalone: true,              // Indique que le composant est autonome
+  selector: 'app-loginbycode',  
+  standalone: true,              
   imports: [CommonModule, FormsModule, HttpClientModule], // Modules nécessaires
-  templateUrl: './loginbycode.component.html',  // Fichier HTML du composant
-  styleUrls: ['./loginbycode.component.css'],   // Fichier CSS du composant
+  templateUrl: './loginbycode.component.html',  
+  styleUrls: ['./loginbycode.component.css'],  
   providers: [UtilisateurService],              // Service injecté
 })
 export class LoginbycodeComponent implements AfterViewInit {
@@ -23,7 +23,7 @@ export class LoginbycodeComponent implements AfterViewInit {
   maskedDigits: string[] = ['', '', '', ''];   // Digits affichés (masqués)
 
   // Variables de gestion d'état
-  errorMessage: string = '';     // Message d'erreur
+  errorMessage: string = '';     
   shakeInputs: boolean = false;  // Animation de secousse des inputs
   inputError: boolean = false;   // État d'erreur des inputs
   isLoggedIn: boolean = false;   // État de connexion
@@ -126,7 +126,8 @@ export class LoginbycodeComponent implements AfterViewInit {
       }
     }, 0);
   }
-
+ 
+  // reinitialiser les inputs si le code est incorrect
   resetInputs() {
     this.codeDigits = ['', '', '', ''];
     this.maskedDigits = ['', '', '', ''];
@@ -194,7 +195,7 @@ export class LoginbycodeComponent implements AfterViewInit {
           this.resetInputs();
           this.shakeInputs = false;
           this.inputError = false;
-        }, 1000);
+        }, 1500);
       }
     );
   }
@@ -242,20 +243,22 @@ export class LoginbycodeComponent implements AfterViewInit {
   }
 
   onKeyDown(event: KeyboardEvent, index: number) {
+        // Vérifie si la touche pressée est "Backspace" (retour arrière)
     if (event.key === 'Backspace') {
       // Si l'input courant est vide
       if (!this.codeDigits[index]) {
-        // Retour à l'input précédent
+         //si nous ne sommes pas sur le premier champ (index > 0)
         if (index > 0) {
+          // Retour à l'input précédent
           const prevInput = this.codeInputs.toArray()[index - 1];
           prevInput?.nativeElement.focus();
           this.codeDigits[index - 1] = '';
           this.maskedDigits[index - 1] = '';
         }
       } else {
-        // Effacement de l'input courant
-        this.codeDigits[index] = '';
-        this.maskedDigits[index] = '';
+            // Si le champ actuel contient une valeur, l'efface simplement
+            this.codeDigits[index] = ''; // Efface la valeur réelle
+        this.maskedDigits[index] = '';  // Efface la valeur masquée
       }
     }
   }
