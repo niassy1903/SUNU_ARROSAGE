@@ -3,13 +3,14 @@ import { Router } from '@angular/router';
 import { UtilisateurService } from '../utilisateur.service'; // Import du service
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   providers: [UtilisateurService],
 })
 export class NavbarComponent implements OnInit {

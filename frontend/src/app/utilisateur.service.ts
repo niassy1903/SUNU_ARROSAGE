@@ -65,16 +65,20 @@ export class UtilisateurService {
 logout(): Observable<any> {
   const token = localStorage.getItem('token');
   return this.http.post(`${this.apiUrl1}/logout`, {}, {
-    headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` })
+    headers: new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    })
   }).pipe(
     tap(() => {
+      // Suppression des informations dans le localStorage après déconnexion réussie
       localStorage.removeItem('token');
+      localStorage.removeItem('prenom');
+      localStorage.removeItem('nom');
       localStorage.removeItem('role');
-      localStorage.removeItem('prenom'); // Suppression du prénom
-      localStorage.removeItem('nom'); // Suppression du nom
     })
   );
 }
+
 
 
 

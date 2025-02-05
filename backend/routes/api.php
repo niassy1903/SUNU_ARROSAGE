@@ -15,9 +15,6 @@ use App\Http\Controllers\UtilisateurController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 
 // routes/api.php
@@ -27,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']);
 Route::post('/logout', [UtilisateurController::class, 'logout']);
 
-//Route::middleware(['check.super_admin'])->group(function () {
+
     Route::post('/utilisateurs', [UtilisateurController::class, 'create']);
 
 
@@ -39,4 +36,4 @@ Route::post('/logout', [UtilisateurController::class, 'logout']);
     Route::put('/utilisateurs/{id}', [UtilisateurController::class, 'update']);
     Route::get('/utilisateurs/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
     Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController::class, 'checkCarteRfidExists']);
-//});
+    Route::get('/utilisateurs/check-email/{email}', [UtilisateurController::class, 'checkEmailExists']);
