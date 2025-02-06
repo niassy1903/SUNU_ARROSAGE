@@ -79,7 +79,9 @@ logout(): Observable<any> {
   );
 }
 
-
+loginByRFID(carte_rfid: string) {
+  return this.http.post<any>('http://localhost:8000/api/login/rfid', { carte_rfid });
+}
 
 
 }

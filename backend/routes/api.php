@@ -37,3 +37,5 @@ Route::post('/logout', [UtilisateurController::class, 'logout']);
     Route::get('/utilisateurs/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
     Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController::class, 'checkCarteRfidExists']);
     Route::get('/utilisateurs/check-email/{email}', [UtilisateurController::class, 'checkEmailExists']);
+    //connexion par carte rfid
+    Route::post('login/rfid', [UtilisateurController::class, 'loginByRfid']);

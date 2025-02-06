@@ -12,6 +12,7 @@
         "laravel/jetstream": "^4.3",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "lcobucci/jwt": "^4.3",
         "livewire/livewire": "^3.0",
         "mongodb/laravel-mongodb": "^5.1",
         "tymon/jwt-auth": "^2.1"

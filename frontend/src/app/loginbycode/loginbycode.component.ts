@@ -272,4 +272,28 @@ export class LoginbycodeComponent implements AfterViewInit {
       }
     );
   }
+
+
+  //connexion par carte rfid
+  onRFIDScan(uid: string) {
+    // Appel du service d'authentification par RFID
+    this.utilisateurService.loginByRFID(uid).subscribe(
+      response => {
+        console.log('Connexion réussie:', response);
+  
+        // Vérifier le rôle et rediriger
+        if (response.user.role === 'super_admin' || response.user.role === 'admin_simple') {
+          this.router.navigate(['/dashboard']);
+        }
+        
+        this.isLoggedIn = true;
+      },
+      error => {
+        console.error('Erreur de connexion:', error);
+        this.errorMessage = "Carte RFID invalide ou non enregistrée.";
+      }
+    );
+  }
+  
+  
 }

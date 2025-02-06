@@ -190,7 +190,46 @@ class UtilisateurController extends Controller
             return response()->json(['error' => 'Code incorrect'], 401);
         }
     }
-    
+
+    //connexion par carte rfid
+    public function loginByRfid(Request $request)
+{
+    // Validation du champ 'carte_rfid' dans la requête
+    $validator = Validator::make($request->all(), [
+        'carte_rfid' => 'required|string|max:255', // Validation de la carte RFID
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    // Récupérer la carte RFID depuis la requête
+    $carte_rfid = $request->input('carte_rfid');
+
+    // Vérifier si un utilisateur existe avec cette carte RFID
+    $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
+
+    if ($utilisateur) {
+        // Si l'utilisateur est trouvé, générer un token JWT
+        $token = JWTAuth::fromUser($utilisateur);
+
+        // Retourner la réponse avec le token et les informations de l'utilisateur
+        return response()->json([
+            'message' => 'Connexion réussie',
+            'token' => $token,
+            'user' => [
+                'nom' => $utilisateur->nom,
+                'prenom' => $utilisateur->prenom,
+                'role' => $utilisateur->role
+            ]
+        ], 201);
+    } else {
+        // Si la carte RFID n'est pas trouvée, retourner une erreur
+        return response()->json(['error' => 'Carte RFID incorrecte'], 401);
+    }
+}
+
+   
 
     public function logout(Request $request)
     {
