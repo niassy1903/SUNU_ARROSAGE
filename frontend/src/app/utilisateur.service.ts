@@ -41,4 +41,27 @@ export class UtilisateurService {
  updateUtilisateur(id: string, utilisateur: any): Observable<any> {
   return this.http.put(`${this.apiUrl}/${id}`, utilisateur);
 }
+// Bloquer plusieurs utilisateurs
+blockMultipleUtilisateurs(ids: string[]): Observable<any> {
+  return this.http.post(`${this.apiUrl}/block-multiple`, { ids });
+}
+
+// Changer le rôle d'un utilisateur
+switchRole(id: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/switch-role/${id}`, {});
+}
+
+
+// Importer des utilisateurs via CSV
+importCsv(formData: FormData): Observable<any> {
+  return this.http.post(`${this.apiUrl}/import-csv`, formData);
+}// Assigner une carte à un utilisateur
+
+assignCard(id: string, carteRfid: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/assigner-carte/${id}`, { carte_rfid: carteRfid });
+}
+
+
+
+
 }

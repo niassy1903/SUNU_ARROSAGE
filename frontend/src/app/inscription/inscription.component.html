@@ -15,11 +15,13 @@
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="prenom">Prénom</label>
-                <input type="text" class="form-control" id="prenom" placeholder="Prénom" [(ngModel)]="prenom" name="prenom" required>
+                <input type="text" class="form-control" id="prenom" placeholder="Prénom" [(ngModel)]="prenom" name="prenom" required (input)="validatePrenom()">
+                <div *ngIf="prenomError" class="text-danger">{{ prenomError }}</div>
               </div>
               <div class="form-group col-md-6">
                 <label for="nom">Nom</label>
-                <input type="text" class="form-control" id="nom" placeholder="Nom" [(ngModel)]="nom" name="nom" required>
+                <input type="text" class="form-control" id="nom" placeholder="Nom" [(ngModel)]="nom" name="nom" required (input)="validateNom()">
+                <div *ngIf="nomError" class="text-danger">{{ nomError }}</div>
               </div>
             </div>
             <div class="form-row">
@@ -29,8 +31,9 @@
                 <div *ngIf="telephoneError" class="text-danger">{{ telephoneError }}</div>
               </div>
               <div class="form-group col-md-6">
-                <label for="adresse">Adresse</label>
-                <input type="text" class="form-control" id="adresse" placeholder="Adresse" [(ngModel)]="adresse" name="adresse" required>
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" [(ngModel)]="email" name="email" required (input)="validateEmail()">
+                <div *ngIf="emailError" class="text-danger">{{ emailError }}</div>
               </div>
             </div>
             <div class="form-row">
@@ -42,12 +45,13 @@
                 </select>
               </div>
               <div class="form-group col-md-6">
-                <label for="carte_rfid">Carte RFID</label>
-                <input type="text" class="form-control" id="carte_rfid" placeholder="Carte RFID" [(ngModel)]="carte_rfid" name="carte_rfid" required (input)="validateCarteRfid()">
-                <div *ngIf="carteRfidError" class="text-danger">{{ carteRfidError }}</div>
+                <label for="adresse">Adresse</label>
+                <input type="text" class="form-control" id="adresse" placeholder="Adresse" [(ngModel)]="adresse" name="adresse" required (input)="validateAdresse()">
+                <div *ngIf="adresseError" class="text-danger">{{ adresseError }}</div>
               </div>
             </div>
-            <button type="submit" class="btn btn-success btn-block" [disabled]="!inscriptionForm.valid || telephoneError || carteRfidError">INSCRIRE</button>
+            
+            <button type="submit" class="btn btn-success btn-block" [disabled]="!inscriptionForm.valid || telephoneError">INSCRIRE</button>
           </form>
         </div>
       </main>
@@ -66,7 +70,8 @@
         </button>
       </div>
       <div class="modal-body">
-        L'utilisateur a été inscrit avec succès.
+        L'utilisateur a été inscrit avec succès. Votre code secret a été envoyé dans votre boîte mail. 
+        Veuillez vérifier votre boîte de réception ( vérifier le dossier spam) pour le code secret.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>

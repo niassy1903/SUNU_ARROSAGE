@@ -35,3 +35,13 @@ Route::delete('/utilisateurs', [UtilisateurController::class, 'deleteMultiple'])
 Route::put('/utilisateurs/{id}', [UtilisateurController::class, 'update']);
 Route::get('/utilisateurs/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
 Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController::class, 'checkCarteRfidExists']);
+
+Route::post('/utilisateurs/block-multiple', [UtilisateurController::class, 'blockMultiple']);
+Route::post('/utilisateurs/switch-role/{id}', [UtilisateurController::class, 'switchRole']);
+Route::post('/utilisateurs/import-csv', [UtilisateurController::class, 'importCsv']);
+
+
+
+Route::post('/utilisateurs/assigner-carte/{id}', [UtilisateurController::class, 'assigner_carte']);
+
+
