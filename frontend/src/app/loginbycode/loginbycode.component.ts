@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UtilisateurService } from '../utilisateur.service';
 import { Router } from '@angular/router';
+import { WebsocketService } from '../websocket.service';
 import { HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -40,15 +41,17 @@ export class LoginbycodeComponent implements AfterViewInit {
   // Nouvelle propriété pour la minuterie
   countdownProgress: number = 0;
 
-  constructor(public utilisateurService: UtilisateurService, private router: Router) {
-        
-    // Vérifie l'état de connexion au chargement
+  constructor(
+    public utilisateurService: UtilisateurService,
+    private router: Router,
+    private webSocketService: WebsocketService  // Injection du service WebSocket
+  ) {
     this.isLoggedIn = !!localStorage.getItem('token');
-        
-    // Vérifie un éventuel blocage précédent
-   this.checkPreviousBlock();
+    this.checkPreviousBlock();
   }
   
+ 
+
   // Méthode appelée après l'initialisation de la vue
 
   ngAfterViewInit() {
@@ -296,4 +299,4 @@ export class LoginbycodeComponent implements AfterViewInit {
   }
   
   
-}
+} 

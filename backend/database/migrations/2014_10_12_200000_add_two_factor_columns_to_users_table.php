@@ -12,17 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->text('two_factor_secret')
-                ->after('password')
-                ->nullable();
-
-            $table->text('two_factor_recovery_codes')
-                ->after('two_factor_secret')
-                ->nullable();
-
-            $table->timestamp('two_factor_confirmed_at')
-                ->after('two_factor_recovery_codes')
-                ->nullable();
+            $table->text('two_factor_secret')->nullable();  // Ajout de la colonne pour le secret 2FA
+            $table->text('two_factor_recovery_codes')->nullable();  // Ajout de la colonne pour les codes de récupération 2FA
+            $table->timestamp('two_factor_confirmed_at')->nullable();  // Ajout de la colonne pour confirmer la 2FA
         });
     }
 
@@ -33,9 +25,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
-                'two_factor_secret',
-                'two_factor_recovery_codes',
-                'two_factor_confirmed_at',
+                'two_factor_secret',  // Suppression de la colonne
+                'two_factor_recovery_codes',  // Suppression de la colonne
+                'two_factor_confirmed_at',  // Suppression de la colonne
             ]);
         });
     }
