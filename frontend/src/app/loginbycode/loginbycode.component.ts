@@ -4,7 +4,7 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
   import { UtilisateurService } from '../utilisateur.service';
   import { Router } from '@angular/router';
   import { HttpClientModule } from '@angular/common/http';
-  //import { io, Socket } from 'socket.io-client';
+  import { io, Socket } from 'socket.io-client';
   
   @Component({
     selector: 'app-loginbycode',
@@ -33,21 +33,21 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
     blockTimer: any;
     countdownProgress: number = 0;
   
-    //socket: Socket;
+    socket: Socket;
   
     constructor(public utilisateurService: UtilisateurService, private router: Router) {
       this.isLoggedIn = !!localStorage.getItem('token');
       this.checkPreviousBlock();
   
       // Connexion WebSocket pour recevoir le Keypad en temps réel
-      /*this.socket = io('http://localhost:5000');
+      this.socket = io('http://localhost:5000');
   
       // Écoute des événements du serveur
       this.socket.on('login_success', (data) => this.handleLoginSuccess(data));
       this.socket.on('login_failed', () => this.handleLoginFailure());
       this.socket.on('login_blocked', (data) => this.handleLoginBlocked(data));
       this.socket.on('login_unblocked', () => this.handleLoginUnblocked());
-      this.socket.on('code_secret', (code: string) => this.handleKeypadInput(code));*/
+      this.socket.on('code_secret', (code: string) => this.handleKeypadInput(code));
     }
   
     ngAfterViewInit() {
