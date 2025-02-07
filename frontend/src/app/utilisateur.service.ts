@@ -42,6 +42,14 @@ export class UtilisateurService {
     return this.http.put(`${this.apiUrl}/${id}`, utilisateur);
   }
 
+
+  // Récupérer les enregistrements d'historique
+  getHistorique(): Observable<any> {
+    return this.http.get(`${this.apiUrl1}/historiques`);
+  }
+
+
+  
    // Connexion par code secret
    loginByCode(codeSecret: string): Observable<{ token: string, user: { prenom: string, nom: string, role: string } }> {
     return this.http.post<{ token: string, user: { prenom: string, nom: string, role: string } }>(

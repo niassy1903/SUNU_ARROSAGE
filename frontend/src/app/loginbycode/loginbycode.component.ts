@@ -28,7 +28,7 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
     maxAttempts: number = 3;
     currentAttempts: number = 0;
     isBlocked: boolean = false;
-    blockDuration: number = 5;
+    blockDuration: number = 15;
     remainingBlockTime: number = 0;
     blockTimer: any;
     countdownProgress: number = 0;

@@ -1,43 +1,46 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { SidebarComponent } from "../sidebar/sidebar.component";
+import { UtilisateurService } from '../utilisateur.service';
 
 @Component({
   selector: 'app-historiques',
   standalone: true,
   imports: [CommonModule, NavbarComponent, SidebarComponent],
   templateUrl: './historiques.component.html',
-  styleUrl: './historiques.component.css'
+  styleUrls: ['./historiques.component.css']
 })
-export class HistoriquesComponent {
-  historiques = [
-    { photo: 'profil.png', prenom: 'Mark', nom: 'Otto', actions: 'crud' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
-    { photo: 'null', prenom: 'Jacob', nom: 'Thornton', actions: 'arrosage automatique' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
-    { photo: 'null', prenom: 'Larry', nom: 'the Bird', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Mark', nom: 'Otto', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Jacob', nom: 'Thornton', actions: 'arrosage automatique' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
-    { photo: 'null', prenom: 'Larry', nom: 'the Bird', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Mark', nom: 'Otto', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Jacob', nom: 'Thornton', actions: 'arrosage automatique', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Larry', nom: 'the Bird', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Mark', nom: 'Otto', actions: 'crud', date: '2021-09-01 12:00:00',heure: '12:00:00' },
-    { photo: 'null', prenom: 'Jacob', nom: 'Thornton', actions: 'arrosage automatique' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
-    { photo: 'null', prenom: 'Larry', nom: 'the Bird', actions: 'crud' , date: '2021-09-01 12:00:00',heure: '12:00:00'},
-  ];
+export class HistoriquesComponent implements OnInit {
+  historiques: any[] = [];
+  page: number = 1;
+  itemsPerPage: number = 5;
 
-  //-----------------------la pagination avec bootstrap------------------------------
-  page: number = 1; // Page actuelle                                                :
-  itemsPerPage: number = 5; // Nombre d'éléments par page                           :
-                                                                                    
-  get paginatedHistorique() {                                                       //
-    const start = (this.page - 1) * this.itemsPerPage;                              //
-    const end = start + this.itemsPerPage;                                          //
-    return this.historiques.slice(start, end);                                      //
+  constructor(private utilisateurService: UtilisateurService) { }
+
+  ngOnInit(): void {
+    this.loadHistorique();
   }
-                                                                                    //
+
+  loadHistorique(): void {
+    this.utilisateurService.getHistorique().subscribe(
+      data => {
+        this.historiques = data.historiques;
+      },
+      error => {
+        console.error('Erreur lors de la récupération de l\'historique', error);
+      }
+    );
+  }
+
+  get paginatedHistorique() {
+    const start = (this.page - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.historiques.slice(start, end);
+  }
+
   totalPages(): number {
-    return Math.ceil(this.historiques.length / this.itemsPerPage);     
+    return Math.ceil(this.historiques.length / this.itemsPerPage);
   }
 
   changePage(newPage: number) {
@@ -45,6 +48,4 @@ export class HistoriquesComponent {
       this.page = newPage;
     }
   }
-
 }
-//------------------------------Fin pagination---------------------------------------

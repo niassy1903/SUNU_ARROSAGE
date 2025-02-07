@@ -4,6 +4,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
+use App\Models\Historique;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -11,6 +13,19 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UtilisateurController extends Controller
 {
+
+//Méthode privée pour enregistrer une action dans l'historique.
+    private function logAction($utilisateurId, $nom, $prenom, $action)
+    {
+        Historique::create([
+            'utilisateur_id' => $utilisateurId, //id de l'utilisateur
+            'nom' => $nom, //nom de l'utilisateur
+            'prenom' => $prenom, 
+            'action' => $action,  //l'action effectuée
+            'date_heure' => now(),  //date et heure de l'action
+        ]);
+    }
+    
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -39,8 +54,9 @@ class UtilisateurController extends Controller
             'telephone' => $request->telephone,
             'adresse' => $request->adresse,
         ]);
+          $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'créer');
 
-        return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
+          return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
     }
 
     public function list()
@@ -55,6 +71,8 @@ class UtilisateurController extends Controller
         if (!$utilisateur) {
             return response()->json(['error' => 'Utilisateur non trouvé'], 404);
         }
+        $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'supprimer');
+
         $utilisateur->delete();
         return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
@@ -72,6 +90,7 @@ class UtilisateurController extends Controller
 
         $ids = $request->input('ids');
         Utilisateur::whereIn('_id', $ids)->delete();
+        
 
         return response()->json(['message' => 'Utilisateurs supprimés avec succès'], 200);
     }
@@ -97,6 +116,9 @@ class UtilisateurController extends Controller
         }
 
         $utilisateur->update($request->only(['nom', 'prenom', 'role', 'telephone', 'adresse', 'carte_rfid']));
+
+        $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'modifier');
+
         return response()->json(['message' => 'Utilisateur mis à jour avec succès', 'utilisateur' => $utilisateur], 200);
     }
 

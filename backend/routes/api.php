@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UtilisateurController;
+use App\Http\Controllers\HistoriqueController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']); //connexion
 Route::post('/logout', [UtilisateurController::class, 'logout']); //déconnexion
+// Route pour récupérer tous les enregistrements d'historique
+Route::get('/historiques', [HistoriqueController::class, 'index']);
 
     Route::post('/utilisateurs', [UtilisateurController::class, 'create']); //créer user
 
