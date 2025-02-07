@@ -15,14 +15,32 @@ body {
   margin-top: 20px;
 }
 
-.btn-custom {
-  background-color: #28bc89;
-  color: white;
-  border: none;
+/* Conteneur des boutons avec Flexbox */
+.button-container {
+  display: flex;
+  flex-wrap: wrap; /* Les boutons passeront à la ligne suivante si nécessaire */
+  gap: 15px; /* Espacement entre les boutons */
+  justify-content: flex-start; /* Aligne les boutons sur la gauche */
 }
 
-.btn-custom:hover {
-  background-color: #219e72;
+/* Les boutons */
+button.btn {
+  flex: 1 0 150px; /* Les boutons auront une largeur minimale de 150px et se redimensionneront pour occuper l'espace disponible */
+  max-width: 200px; /* Limite la taille maximale */
+  margin-bottom: 15px; /* Espacement vertical entre les lignes de boutons */
+}
+
+/* Optionnel : Style personnalisé pour les boutons */
+.btn-custom {
+  background-color: #28a745;
+  color: white;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* Si vous souhaitez ajouter un effet de hover pour plus de style */
+button.btn:hover {
+  opacity: 0.9;
 }
 
 .table th, .table td {
@@ -116,4 +134,50 @@ body {
     font-size: 0.875rem;
     margin-top: 5px;
   }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 17px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: #28a745;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(13px);
+  }
+  
   

@@ -13,7 +13,8 @@
           <!-- Top Stats -->
           <div class="stats-container">
             <div class="stat-box">
-              <p class="date-time">05/02/2025 12h32</p>
+             
+              <p class="date-time"> {{ '' | currentTime }}</p>
               <p class="stat-title">État pompe</p>
               <div class="status">
                 <img id="allume" src="les-controles.png" class="stat-icon" alt="Humidité">
@@ -47,8 +48,57 @@
             </div>
 
             <div class="chart">
-              <h2>Volume d'eau par plante</h2>
-              <canvas id="waterChart"></canvas>
+              <div class="chart">
+                <div class="planning-container">
+                  <!-- Partie gauche - Planification -->
+                  <div class="planning-left">
+                    <h2 class="planning-title">planification arrosage</h2>
+                    <div class="time-selector">
+                      <div class="time-input-group">
+                        <label for="start-time">Début</label>
+                        <input id="start-time" type="time" [(ngModel)]="startTime" class="time-input" >
+                        <label for="start-time">Fin</label>
+                        <input id="end-time" type="time" [(ngModel)]="endTime" class="time-input">
+                      </div>
+                    </div>
+                    <div class="plan-actions">
+                      <button class="validate-button" (click)="validateTime()">Valider</button>
+                      <button class="cancel-button" (click)="clearTime()">Arrêter</button>
+                    </div>
+                  </div>
+              <!---->
+              <div >
+                <ng-container *ngTemplateOutlet="timeDisplay; context: { $implicit: schedules | timeCountdownPipe }">
+                </ng-container>
+              </div>
+              
+              <ng-template #timeDisplay let-time>
+               
+                <div class="countdown" [ngClass]="{'alert': time.isAlert}">
+                  <p class="next-watering">Prochain arrosage dans: {{ time.countdown }}</p>
+                </div>
+              </ng-template>
+                  <!---->
+                  <!-- Partie droite - Horaires planifiés -->
+                 <!-- Partie droite - Horaires planifiés -->
+                    <div class="planning-right">
+                      <p class="planning-list-title">Planifications</p>
+                      <div class="scheduled-times">
+                        <ng-container *ngFor="let schedule of schedules">
+                          <!-- Un élément div pour chaque horaire -->
+                          <div class="scheduled-time">
+                            {{ schedule.startTime }} - {{ schedule.endTime }}
+                            <button (click)="deleteSchedule(schedule._id)" class="delete-button">
+                              <i class="fas fa-times"></i> <!-- Icône croix -->
+                            </button>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+
+                </div>
+              </div>
+              
             </div>
           </div>
 
