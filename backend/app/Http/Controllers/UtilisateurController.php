@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Notifications\CodeSecretNotification;
 use Carbon\Carbon;
 
+
 class UtilisateurController extends Controller
 {
     private function logAction($userId, $nom, $prenom, $action)
