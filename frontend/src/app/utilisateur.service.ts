@@ -12,6 +12,22 @@ export class UtilisateurService {
 
   constructor(private http: HttpClient) { }
 
+  // Récupérer tous les historiques
+getHistoriques(): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques`);
+}
+
+// Récupérer les historiques d'un utilisateur spécifique
+getHistoriquesByUser(userId: string): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques/${userId}`);
+}
+
+// Filtrer les historiques par date
+filterHistoriquesByDate(date: string): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques/filter?date=${date}`);
+}
+
+
   // Créer un utilisateur
   createUtilisateur(utilisateur: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, utilisateur);

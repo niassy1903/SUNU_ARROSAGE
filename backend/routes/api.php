@@ -25,7 +25,12 @@ use App\Http\Controllers\UtilisateurController;
 
 // routes/api.php
 
-use App\Http\Controllers\UtilisateursController;
+use App\Http\Controllers\HistoriqueController;
+
+Route::get('/historiques', [HistoriqueController::class, 'index']);
+Route::get('/historiques/{userId}', [HistoriqueController::class, 'show']);
+Route::get('/historiques/filter', [HistoriqueController::class, 'filterByDate']);
+
 
 Route::post('/utilisateurs', [UtilisateurController::class, 'create']);
 Route::get('/utilisateurs/{id}', [UtilisateurController::class, 'getUtilisateur']);
