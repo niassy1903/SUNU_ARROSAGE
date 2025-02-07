@@ -20,8 +20,9 @@ use App\Http\Controllers\UtilisateurController;
 // routes/api.php
 
 
-Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']); //connexion
-Route::post('/logout', [UtilisateurController::class, 'logout']); //déconnexion
+
+
+// routes/api.php
 
 use App\Http\Controllers\HistoriqueController;
 
@@ -46,5 +47,3 @@ Route::post('/utilisateurs/import-csv', [UtilisateurController::class, 'importCs
 
 
 Route::post('/utilisateurs/assigner-carte/{id}', [UtilisateurController::class, 'assigner_carte']);
-
-

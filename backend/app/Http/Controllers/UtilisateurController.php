@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 
+
 class UtilisateurController extends Controller
 {
     private function logAction($userId, $nom, $prenom, $action)
