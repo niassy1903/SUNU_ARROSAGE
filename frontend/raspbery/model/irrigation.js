@@ -1,4 +1,5 @@
 // models/irrigation.js
+
 const mongoose = require('mongoose');
 
 const irrigationSchema = new mongoose.Schema({
@@ -10,7 +11,8 @@ const irrigationSchema = new mongoose.Schema({
   type_arrosage: { type: String, enum: ['manuelle', 'automatique'], required: true },
   moyenne_humiditer: { type: Number }, // Champ pour stocker la moyenne d'humidité
   moyenne_luminositer: { type: Number }, // Champ pour stocker la moyenne de luminosité
-  moyenne_volume_arroser: { type: Number } // Champ pour stocker la moyenne de volume d'eau
+  moyenne_volume_arroser: { type: Number }, // Champ pour stocker la moyenne de volume d'eau
+  pumpState: { type: Boolean, default: false } // Champ pour stocker l'état de la pompe
 });
 
 const Irrigation = mongoose.model('Irrigation', irrigationSchema);

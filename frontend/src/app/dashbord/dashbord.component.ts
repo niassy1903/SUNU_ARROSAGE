@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy,Component, OnInit } from '@angular/core';
 import Chart from 'chart.js/auto';
+import { io, Socket } from 'socket.io-client';
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -11,13 +12,18 @@ import { PipeTransform,Pipe } from '@angular/core';
 import { CurrentTimePipe } from '../pipes/current-time.pipe';
 import { IrrigationData,IrrigationService } from '../services/irrigation.service';
 import { TimeCountdownPipePipe } from '../pipes/time-countdown.pipe.pipe';
+import { PompeService } from '../services/pompe.service';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { FormatSensorDataPipe } from '../format-sensor-data.pipe';
 @Component({
   selector: 'app-dashbord',
   standalone: true,
-  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe],
+  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe,FormatSensorDataPipe],
   templateUrl: './dashbord.component.html',
   styleUrl: './dashbord.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
+  
+  
 })
 
 
@@ -29,16 +35,31 @@ export class DashbordComponent implements OnInit {
   countdown: string = '';
   currentDateTime: string = ''; 
   private timerInterval: any;
+  humidity: string = '0%';
+  luminosity: string = '0 lx';
+  private socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
   private destroyed = false;
+  isPompeOn: boolean = false;
+
   constructor(private irrigationService: IrrigationService,
     private PlaningService:PlaningService,
+    private PompeService:PompeService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.loadChartData();
     this.loadSchedules();
-  
+   
+    this.PompeService.pumpState$.subscribe(
+      state => this.isPompeOn = state
+    );
+    this.socket.on('sensorData', (data) => {
+      console.log('Données du capteur reçues :', data);
+      this.humidity = data; // Pas besoin de formater ici, le pipe s'en chargera
+      this.luminosity = data; // Pas besoin de formater ici, le pipe s'en chargera
+      this.cdr.detectChanges();
+    });
   }
 
  
@@ -240,8 +261,26 @@ createLuminosityChart(labels: string[], data: number[]) {
     }
   }
   
-  // Fonction pour mettre à jour la date et l'heure actuelles
- 
-  
-  
+  //fonction pour le bouton switch
+//dasbord.ts
+// Fonction pour basculer l'état de la pompe
+togglePompe() {
+  const newState = !this.isPompeOn;
+  this.PompeService.togglePump(newState).subscribe({
+    next: (response) => {
+      if (response.success) {
+        console.log('Pompe état changé:', response.state);
+        // L'état sera mis à jour via le BehaviorSubject dans le service
+      } else {
+        console.error('Erreur lors du changement d\'état');
+        this.isPompeOn = !newState; // Revenir à l'état précédent en cas d'erreur
+      }
+    },
+    error: (error) => {
+      console.error('Erreur:', error);
+      this.isPompeOn = !newState; // Revenir à l'état précédent en cas d'erreur
+    }
+  });
+}
+
 }
