@@ -191,43 +191,43 @@ class UtilisateurController extends Controller
         }
     }
 
-    //connexion par carte rfid
     public function loginByRfid(Request $request)
-{
-    // Validation du champ 'carte_rfid' dans la requête
-    $validator = Validator::make($request->all(), [
-        'carte_rfid' => 'required|string|max:255', // Validation de la carte RFID
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 400);
+    {
+        // Validation du champ 'carte_rfid'
+        $validator = Validator::make($request->all(), [
+            'carte_rfid' => 'required|string|max:255',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+    
+        // Récupérer la carte RFID
+        $carte_rfid = $request->input('carte_rfid');
+    
+        // Recherche de l'utilisateur par carte RFID
+        $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
+    
+        if ($utilisateur) {
+            // Générer un token JWT
+            $token = JWTAuth::fromUser($utilisateur);
+    
+            // Réponse avec le token et les informations utilisateur
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'token' => $token,
+                'user' => [
+                    'nom' => $utilisateur->nom,
+                    'prenom' => $utilisateur->prenom,
+                    'role' => $utilisateur->role
+                ]
+            ], 200); // Code HTTP 200 pour une réussite
+        } else {
+            // Erreur si la carte RFID n'est pas trouvée
+            return response()->json(['error' => 'Carte RFID incorrecte'], 401); // Code HTTP 401 pour non autorisé
+        }
     }
-
-    // Récupérer la carte RFID depuis la requête
-    $carte_rfid = $request->input('carte_rfid');
-
-    // Vérifier si un utilisateur existe avec cette carte RFID
-    $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
-
-    if ($utilisateur) {
-        // Si l'utilisateur est trouvé, générer un token JWT
-        $token = JWTAuth::fromUser($utilisateur);
-
-        // Retourner la réponse avec le token et les informations de l'utilisateur
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'token' => $token,
-            'user' => [
-                'nom' => $utilisateur->nom,
-                'prenom' => $utilisateur->prenom,
-                'role' => $utilisateur->role
-            ]
-        ], 201);
-    } else {
-        // Si la carte RFID n'est pas trouvée, retourner une erreur
-        return response()->json(['error' => 'Carte RFID incorrecte'], 401);
-    }
-}
+    
 
    
 

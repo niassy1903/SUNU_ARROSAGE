@@ -44,11 +44,17 @@ export class LoginbycodeComponent implements AfterViewInit {
   constructor(
     public utilisateurService: UtilisateurService,
     private router: Router,
-    private webSocketService: WebsocketService  // Injection du service WebSocket
+    private websocketService: WebsocketService  // Injection du service WebSocket
   ) {
-    this.isLoggedIn = !!localStorage.getItem('token');
+    // Vérification si localStorage est défini
+    if (typeof localStorage !== 'undefined') {
+      this.isLoggedIn = !!localStorage.getItem('token');
+    } else {
+      this.isLoggedIn = false;
+    }
     this.checkPreviousBlock();
   }
+  
   
  
 
@@ -286,7 +292,7 @@ export class LoginbycodeComponent implements AfterViewInit {
   
         // Vérifier le rôle et rediriger
         if (response.user.role === 'super_admin' || response.user.role === 'admin_simple') {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashbord']);
         }
         
         this.isLoggedIn = true;

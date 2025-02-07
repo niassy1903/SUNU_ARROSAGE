@@ -1,9 +1,8 @@
-// server.js
-
 const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');
-const axios = require('axios'); // Assurez-vous d'installer axios
+const axios = require('axios');
+const { SerialPort, ReadlineParser } = require('serialport'); // Importation du module série
 
 // Créez une application Express
 const app = express();
@@ -12,30 +11,42 @@ const server = http.createServer(app);
 // Créez un serveur WebSocket
 const wss = new WebSocket.Server({ server });
 
-// Quand un client se connecte
-wss.on('connection', (ws) => {
-    console.log('Un client est connecté');
-    
-    // Envoyer un message au client
-    ws.send('Bienvenue dans le serveur WebSocket!');
+// Configuration du port série (modifie COM3 ou /dev/ttyUSB0 selon ton OS)
+const port = new SerialPort({
+    path: '/dev/ttyACM0', // Remplace par ton port série (ex: COM3 sous Windows)
+    baudRate: 9600,
+});
 
-    // Écouter les messages du client
-    ws.on('message', async (message) => {
-        console.log('Message reçu: ', message);
-        
-        // Appel de l'API Laravel pour login avec RFID
-        try {
-            const response = await axios.post('http://localhost:8000/api/login/rfid', {
-                rfid: message.trim(),
-            });
-            ws.send(`Réponse du serveur: ${response.data.message}`);
-        } catch (error) {
-            console.error('Erreur lors de l\'appel à l\'API :', error);
-            ws.send('Erreur lors de la connexion.');
+const parser = port.pipe(new ReadlineParser({ delimiter: '\n' })); // Lecture ligne par ligne
+
+// Quand l'Arduino envoie un message
+parser.on('data', async (rfid) => {
+    console.log(`Donnée reçue de l'Arduino: ${rfid.trim()}`);
+
+    // Envoi au WebSocket (si un client est connecté)
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(rfid.trim());
         }
     });
 
-    // Quand la connexion est fermée
+    // Appel API Laravel pour vérifier le RFID
+    try {
+        const response = await axios.post('http://localhost:8000/api/login/rfid', {
+            carte_rfid: rfid.trim(), // Utiliser le même nom que dans le contrôleur Laravel
+        });
+        console.log(`Réponse du serveur: ${response.data.message}`);
+    } catch (error) {
+        console.error('Erreur lors de l\'appel à l\'API :', error);
+    }
+});
+
+// Quand un client WebSocket se connecte
+wss.on('connection', (ws) => {
+    console.log('Un client est connecté');
+    
+    ws.send('Bienvenue sur le serveur WebSocket!');
+
     ws.on('close', () => {
         console.log('Le client a quitté');
     });
