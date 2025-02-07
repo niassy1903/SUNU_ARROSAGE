@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 declare var $: any;
 
 interface User {
-statut: any;
+status: any;
   _id: string;
   nom: string;
   prenom: string;
@@ -21,6 +21,7 @@ statut: any;
   carte_rfid: string;
   matricule: string;
   code_secret: string;
+  email: string;
 }
 
 @Component({
@@ -36,7 +37,7 @@ export class UtilisateurComponent implements OnInit {
   paginatedUsers: User[] = [];
   searchTerm: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 13;
+  itemsPerPage: number = 8;
   totalPages: number = 0;
   userToDelete: User | null = null;
   selectedUser: User | null = null;
@@ -63,7 +64,7 @@ export class UtilisateurComponent implements OnInit {
       }
     );
   }
-  
+
   filterAndPaginateUsers(): void {
     let filteredUsers = this.users.filter(user =>
       user.nom.toLowerCase().includes(this.searchTerm.toLowerCase()) ||

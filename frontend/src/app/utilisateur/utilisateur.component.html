@@ -63,8 +63,8 @@
         <td>{{ user.role }}</td>
         <td>{{ user.telephone }}</td>
         <td>
-          <span *ngIf="user.statut === 'actif'" class="badge badge-success">Actif</span>
-          <span *ngIf="user.statut === 'bloque'" class="badge badge-danger">Bloqué</span>
+          <span *ngIf="user.status === 'actif'" class="badge badge-success">Actif</span>
+          <span *ngIf="user.status === 'inactif'" class="badge badge-danger">Bloqué</span>
         </td>
         <td>
           <button class="btn btn-danger btn-sm mr-2" (click)="confirmDelete(user)">
@@ -152,10 +152,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
         <button type="button" class="btn btn-primary" (click)="assignCard()">Assigner</button>
-<<<<<<< HEAD
-=======
 
->>>>>>> Anta_Niassy
       </div>
     </div>
   </div>
@@ -175,8 +172,9 @@
         <img src="profil.png" alt="User Photo" class="rounded-circle img-thumbnail mb-3">
         <h5>{{ selectedUser?.nom }} {{ selectedUser?.prenom }}</h5>
         <p>Téléphone: {{ selectedUser?.telephone }}</p>
+        <p>Email: {{ selectedUser?.email }}</p>
         <p>Adresse: {{ selectedUser?.adresse }}</p>
-        <p>Code Secret: {{ selectedUser?.code_secret }}</p>
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
