@@ -4,6 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UtilisateurController;
 
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,7 +25,8 @@ use App\Http\Controllers\UtilisateurController;
 
 // routes/api.php
 
-
+Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']); //connexion
+Route::post('/logout', [UtilisateurController::class, 'logout']); //déconnexion
 
 
 // routes/api.php

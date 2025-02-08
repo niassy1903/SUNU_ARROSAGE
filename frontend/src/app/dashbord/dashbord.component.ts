@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy,Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy,Component, OnInit,AfterViewInit,OnDestroy } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -11,17 +11,29 @@ import { PipeTransform,Pipe } from '@angular/core';
 import { CurrentTimePipe } from '../pipes/current-time.pipe';
 import { IrrigationData,IrrigationService } from '../services/irrigation.service';
 import { TimeCountdownPipePipe } from '../pipes/time-countdown.pipe.pipe';
+import { Subscription } from 'rxjs';
+import { SensorDataService } from '../sensor-data.service'; // Importer le service
+
 @Component({
   selector: 'app-dashbord',
   standalone: true,
   imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe],
   templateUrl: './dashbord.component.html',
   styleUrl: './dashbord.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [SensorDataService],
 })
 
 
 export class DashbordComponent implements OnInit {
+
+  humidity: number = 0;
+  luminosity: number = 0;
+
+  private sensorDataSubscription: Subscription | undefined;
+  private sensorDataInterval: any;
+ 
+
   startTime: string = '';
   endTime: string = '';
   schedules: Array<{ _id?: string, startTime: string, endTime: string }> = []; // Ajoutez _id pour la suppression
@@ -32,12 +44,15 @@ export class DashbordComponent implements OnInit {
   private destroyed = false;
   constructor(private irrigationService: IrrigationService,
     private PlaningService:PlaningService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, private sensorDataService: SensorDataService
+    
   ) {}
 
   ngOnInit() {
     this.loadChartData();
     this.loadSchedules();
+    this.fetchSensorData();
+    this.sensorDataInterval = setInterval(() => this.fetchSensorData(), 2000);
   
   }
 
@@ -49,9 +64,25 @@ export class DashbordComponent implements OnInit {
       clearInterval(this.timerInterval);
     }
     this.destroyed = true;
+
+    if (this.sensorDataSubscription) {
+      this.sensorDataSubscription.unsubscribe();
+    }
+    if (this.sensorDataInterval) {
+      clearInterval(this.sensorDataInterval);
+    }
+    
   }
 
+ 
 
+  fetchSensorData(): void {
+    this.sensorDataSubscription = this.sensorDataService.getSensorData().subscribe((data: any) => {
+      this.humidity = data.humidity; // Récupérer l'humidité directement
+      this.luminosity = data.light; // Récupérer la luminosité directement
+      this.cdr.markForCheck(); // Met à jour l'affichage
+    });
+  }
   
   loadChartData() {
   this.irrigationService.getLastSevenDaysMeans().subscribe({

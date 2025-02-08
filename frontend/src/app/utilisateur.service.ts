@@ -1,13 +1,16 @@
+// src/app/utilisateur.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilisateurService {
   private apiUrl = 'http://localhost:8000/api/utilisateurs'; // Remplacez par l'URL de votre API
+
   private apiUrl1 = 'http://localhost:8000/api'; // Remplacez par l'URL de votre API
 
   constructor(private http: HttpClient) { }
@@ -53,10 +56,28 @@ filterHistoriquesByDate(date: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}`, { body: { ids } });
   }
 
-
  // Mettre à jour un utilisateur
  updateUtilisateur(id: string, utilisateur: any): Observable<any> {
   return this.http.put(`${this.apiUrl}/${id}`, utilisateur);
+}
+// Bloquer plusieurs utilisateurs
+blockMultipleUtilisateurs(ids: string[]): Observable<any> {
+  return this.http.post(`${this.apiUrl}/block-multiple`, { ids });
+}
+
+// Changer le rôle d'un utilisateur
+switchRole(id: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/switch-role/${id}`, {});
+}
+
+
+// Importer des utilisateurs via CSV
+importCsv(formData: FormData): Observable<any> {
+  return this.http.post(`${this.apiUrl}/import-csv`, formData);
+}// Assigner une carte à un utilisateur
+
+assignCard(id: string, carteRfid: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/assigner-carte/${id}`, { carte_rfid: carteRfid });
 }
 
  // Connexion par code secret
@@ -65,7 +86,7 @@ filterHistoriquesByDate(date: string): Observable<any> {
     `${this.apiUrl1}/login-by-code`, 
     { code_secret: codeSecret }
   ).pipe(
-    map(response => {
+    map((response: { token: string, user: { prenom: string, nom: string, role: string } }) => {
       if (response.token) {
         localStorage.setItem('token', response.token);
         localStorage.setItem('prenom', response.user.prenom);
@@ -96,25 +117,7 @@ return this.http.post(`${this.apiUrl1}/logout`, {}, {
 );
 }
 
-// Bloquer plusieurs utilisateurs
-blockMultipleUtilisateurs(ids: string[]): Observable<any> {
-  return this.http.post(`${this.apiUrl}/block-multiple`, { ids });
-}
 
-// Changer le rôle d'un utilisateur
-switchRole(id: string): Observable<any> {
-  return this.http.post(`${this.apiUrl}/switch-role/${id}`, {});
-}
-
-
-// Importer des utilisateurs via CSV
-importCsv(formData: FormData): Observable<any> {
-  return this.http.post(`${this.apiUrl}/import-csv`, formData);
-}// Assigner une carte à un utilisateur
-
-assignCard(id: string, carteRfid: string): Observable<any> {
-  return this.http.post(`${this.apiUrl}/assigner-carte/${id}`, { carte_rfid: carteRfid });
-}
 
 
 

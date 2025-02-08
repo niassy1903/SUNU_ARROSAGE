@@ -9,6 +9,8 @@ import { EditComponent } from './edit/edit.component';
 import { LoginbycodeComponent } from './loginbycode/loginbycode.component';
 import { AuthGuard } from './auth.guard'; // Import du guard
 
+
+
 export const routes: Routes = [
     {path: 'utilisateur', component: UtilisateurComponent, canActivate: [AuthGuard]},
     {path: 'navbar', component: NavbarComponent, canActivate: [AuthGuard]},
@@ -19,4 +21,9 @@ export const routes: Routes = [
     {path: 'edit/:id', component: EditComponent, canActivate: [AuthGuard]},
     { path: '', redirectTo: 'loginbycode', pathMatch: 'full' },
     {path: 'loginbycode', component: LoginbycodeComponent}, // La page de login n'a pas besoin du guard
+
+   
+
+
+
 ];

@@ -11,8 +11,8 @@ import Swal from 'sweetalert2';
 declare var $: any;
 
 interface User {
-status: any;
-  _id: string;
+  status: any;
+  id: string;
   nom: string;
   prenom: string;
   role: string;
@@ -95,7 +95,7 @@ export class UtilisateurComponent implements OnInit {
 
   deleteUser(): void {
     if (this.userToDelete) {
-      this.utilisateurService.deleteUtilisateur(this.userToDelete._id).subscribe(
+      this.utilisateurService.deleteUtilisateur(this.userToDelete.id).subscribe(
         (response) => {
           console.log('Utilisateur supprimé avec succès', response);
           $('#deleteConfirmationModal').modal('hide');
@@ -108,9 +108,20 @@ export class UtilisateurComponent implements OnInit {
     }
   }
 
+
   editUser(user: User): void {
-    this.router.navigate(['/edit', user._id]);
+    if (user && user.id) {
+      this.router.navigate(['/edit', user.id]);
+    } else {
+      console.error("L'utilisateur sélectionné n'a pas d'ID valide", user);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: "Impossible d'éditer cet utilisateur, ID manquant.",
+      });
+    }
   }
+  
 
 
 
@@ -127,7 +138,7 @@ export class UtilisateurComponent implements OnInit {
 
   assignCard() {
     if (this.selectedUser && this.carte_rfid_modal) {
-      this.utilisateurService.assignCard(this.selectedUser._id, this.carte_rfid_modal).subscribe(
+      this.utilisateurService.assignCard(this.selectedUser.id, this.carte_rfid_modal).subscribe(
         response => {
           Swal.fire({
             icon: 'success',
@@ -179,7 +190,7 @@ export class UtilisateurComponent implements OnInit {
             confirmButtonText: 'Oui, supprimer!'
         }).then((result) => {
             if (result.isConfirmed) {
-                this.utilisateurService.deleteMultipleUtilisateurs(this.selectedUsers.map(user => user._id)).subscribe(
+                this.utilisateurService.deleteMultipleUtilisateurs(this.selectedUsers.map(user => user.id)).subscribe(
                     (response) => {
                         Swal.fire(
                             'Supprimé!',
@@ -209,7 +220,7 @@ blockMultiple(): void {
           confirmButtonText: 'Oui, bloquer!'
       }).then((result) => {
           if (result.isConfirmed) {
-              this.utilisateurService.blockMultipleUtilisateurs(this.selectedUsers.map(user => user._id)).subscribe(
+              this.utilisateurService.blockMultipleUtilisateurs(this.selectedUsers.map(user => user.id)).subscribe(
                   (response) => {
                       Swal.fire(
                           'Bloqué!',
@@ -249,7 +260,7 @@ selectAll(): void {
 
   switchRole(): void {
     if (this.selectedUsers.length === 1) {
-        this.utilisateurService.switchRole(this.selectedUsers[0]._id).subscribe(
+        this.utilisateurService.switchRole(this.selectedUsers[0].id).subscribe(
             (response) => {
                 Swal.fire({
                     icon: 'success',
