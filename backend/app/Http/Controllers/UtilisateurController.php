@@ -37,7 +37,36 @@ class UtilisateurController extends Controller
             'adresse' => 'required|string|max:255',
             'carte_rfid' => 'nullable|string|max:255|unique:utilisateurs',
             'email' => 'required|email|unique:utilisateurs',
+        ], [
+            'nom.required' => 'Le champ nom est obligatoire.',
+            'nom.string' => 'Le nom doit être une chaîne de caractères.',
+            'nom.max' => 'Le nom ne doit pas dépasser 255 caractères.',
+        
+            'prenom.required' => 'Le champ prénom est obligatoire.',
+            'prenom.string' => 'Le prénom doit être une chaîne de caractères.',
+            'prenom.max' => 'Le prénom ne doit pas dépasser 255 caractères.',
+        
+            'role.required' => 'Le champ rôle est obligatoire.',
+            'role.in' => 'Le rôle doit être soit "admin_simple" soit "super_admin".',
+        
+            'telephone.required' => 'Le champ téléphone est obligatoire.',
+            'telephone.string' => 'Le téléphone doit être une chaîne de caractères.',
+            'telephone.max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères.',
+            'telephone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
+        
+            'adresse.required' => 'Le champ adresse est obligatoire.',
+            'adresse.string' => 'L\'adresse doit être une chaîne de caractères.',
+            'adresse.max' => 'L\'adresse ne doit pas dépasser 255 caractères.',
+        
+            'carte_rfid.string' => 'La carte RFID doit être une chaîne de caractères.',
+            'carte_rfid.max' => 'La carte RFID ne doit pas dépasser 255 caractères.',
+            'carte_rfid.unique' => 'Cette carte RFID est déjà utilisée.',
+        
+            'email.required' => 'Le champ email est obligatoire.',
+            'email.email' => 'L\'email doit être une adresse email valide.',
+            'email.unique' => 'Cet email est déjà utilisé.',
         ]);
+        
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);

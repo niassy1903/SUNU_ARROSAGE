@@ -20,7 +20,7 @@ const sshConfig = {
 // Commande à exécuter sur le Raspberry Pi
 const command = 'python3 /home/niassy/ardi.py';
 
-let sensorData = { humidity: null, light: null };
+let sensorData = { humidity: null, light: null, waterLevel: null }; // Ajouter un niveau d'eau
 
 // Fonction pour récupérer les données via SSH
 function fetchSensorData() {
@@ -44,14 +44,15 @@ function fetchSensorData() {
         const output = data.toString().trim();
         console.log('📊 Données reçues:', output);
 
-        // Extraction de l'humidité et de la luminosité
-        const regex = /Humidité : (\d+)%.*Luminosité : (\d+)%/s;
+        // Extraction de l'humidité, de la luminosité et du niveau d'eau
+        const regex = /Humidité : (\d+)%.*Luminosité : (\d+)%.*Niveau d\'eau : (\d+)%/s;
         const matches = output.match(regex);
 
         if (matches) {
           sensorData = {
             humidity: parseInt(matches[1], 10),
-            light: parseInt(matches[2], 10)
+            light: parseInt(matches[2], 10),
+            waterLevel: parseInt(matches[3], 10) // Ajouter le niveau d'eau
           };
         }
       });
@@ -77,7 +78,11 @@ app.get('/api/sensors/light', (req, res) => {
   res.json({ light: sensorData.light });
 });
 
-// Mise à jour des données toutes les 5 secondes
+app.get('/api/sensors/waterLevel', (req, res) => {  // Ajouter une route pour le niveau d'eau
+  res.json({ waterLevel: sensorData.waterLevel });
+});
+
+// Mise à jour des données toutes les 2 secondes
 setInterval(fetchSensorData, 2000);
 
 app.listen(PORT, () => {

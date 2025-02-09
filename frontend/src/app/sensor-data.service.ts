@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class SensorDataService {
   private apiUrl = 'http://localhost:3000/api/sensors'; // Endpoint général
+  private waterLevelUrl = 'http://localhost:3000/api/sensors/waterLevel'; // Endpoint pour le niveau d'eau
 
   constructor(private http: HttpClient) {}
 
@@ -23,5 +24,10 @@ export class SensorDataService {
   // Récupérer uniquement la luminosité
   getLight(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/light`);
+  }
+
+  // Récupérer le niveau d'eau
+  getWaterLevel(): Observable<any> {
+    return this.http.get<any>(this.waterLevelUrl);
   }
 }

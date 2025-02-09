@@ -29,6 +29,7 @@ export class DashbordComponent implements OnInit {
 
   humidity: number = 0;
   luminosity: number = 0;
+  volumeEau: number = 0; // Ajoutez cette ligne pour le volume d'eau
 
   private sensorDataSubscription: Subscription | undefined;
   private sensorDataInterval: any;
@@ -78,11 +79,14 @@ export class DashbordComponent implements OnInit {
 
   fetchSensorData(): void {
     this.sensorDataSubscription = this.sensorDataService.getSensorData().subscribe((data: any) => {
-      this.humidity = data.humidity; // Récupérer l'humidité directement
-      this.luminosity = data.light; // Récupérer la luminosité directement
+      this.humidity = data.humidity; // Récupérer l'humidité
+      this.luminosity = data.light; // Récupérer la luminosité
+      this.volumeEau = data.waterLevel; // Assurez-vous que la clé 'volumeEau' existe dans les données
+  
       this.cdr.markForCheck(); // Met à jour l'affichage
     });
   }
+  
   
   loadChartData() {
   this.irrigationService.getLastSevenDaysMeans().subscribe({
