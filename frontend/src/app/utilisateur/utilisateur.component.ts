@@ -110,6 +110,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     $('#deleteConfirmationModal').modal('show');
   }
 
+  // Supprimer un utilisateur
   deleteUser(): void {
     if (this.userToDelete) {
       this.utilisateurService.deleteUtilisateur(this.userToDelete.id).subscribe(
@@ -125,6 +126,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Editer un utilisateur
   editUser(user: User): void {
     if (user && user.id) {
       this.router.navigate(['/edit', user.id]);
@@ -148,6 +150,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     $('#assignCardModal').modal('show');
   }
 
+  // Affecter une carte RFID à l'utilisateur sélectionné
   assignCard() {
     if (this.selectedUser && this.carte_rfid_modal) {
       this.utilisateurService.assignCard(this.selectedUser.id, this.carte_rfid_modal).subscribe(
@@ -188,7 +191,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-
+//confirmer la suppression de plusieurs utilisateurs
   confirmDeleteMultiple(): void {
     if (this.selectedUsers.length > 0) {
       Swal.fire({
@@ -218,7 +221,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-
+//bloquer plusieurs utilisateurs
   blockMultiple(): void {
     if (this.selectedUsers.length > 0) {
       Swal.fire({
@@ -258,7 +261,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       this.selectedUsers = [...this.paginatedUsers];
     }
   }
-
+// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.ts:
   openSwitchRoleModal(): void {
     if (this.selectedUsers.length === 1) {
       $('#switchRoleModal').modal('show');
@@ -267,6 +270,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Changer le rôle de l'utilisateur sélectionné
   switchRole(): void {
     if (this.selectedUsers.length === 1) {
       this.utilisateurService.switchRole(this.selectedUsers[0].id).subscribe(
@@ -288,7 +292,10 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
           });
         }
       );
-    } else {
+
+    } 
+    
+    else {
       Swal.fire({
         icon: 'warning',
         title: 'Sélection requise',
@@ -296,15 +303,18 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
+// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.ts:
 
   openCsvImportModal(): void {
     $('#csvImportModal').modal('show');
   }
 
+  // Gérer la sélection d'un fichier CSV
   onFileSelected(event: any): void {
     this.csvFile = event.target.files[0];
   }
 
+  // Gérer la sélection d'un utilisateur
   toggleSelection(user: User): void {
     const index = this.selectedUsers.indexOf(user);
     if (index === -1) {
@@ -313,8 +323,50 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       this.selectedUsers.splice(index, 1);
     }
   }
-
+// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.html:*ngFor="let user of paginatedUsers"
+// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.html:
   isSelected(user: User): boolean {
     return this.selectedUsers.includes(user);
   }
+
+  // Importer un fichier CSV
+  importCsv() {
+    if (this.csvFile) {
+      const formData = new FormData();
+      formData.append('csv_file', this.csvFile);
+      this.utilisateurService.importCsv(formData).subscribe(
+        response => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: response.message,
+          });
+          $('#csvImportModal').modal('hide');
+        },
+        error => {
+          if (error.error && error.error.error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: error.error.error,
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: 'Une erreur inattendue s\'est produite.',
+            });
+          }
+        }
+      );
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Attention',
+        text: 'Aucun fichier CSV sélectionné.',
+      });
+    }
+  }
+  
+
 }

@@ -50,6 +50,7 @@ Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController
 
 Route::post('/utilisateurs/block-multiple', [UtilisateurController::class, 'blockMultiple']);
 Route::post('/utilisateurs/switch-role/{id}', [UtilisateurController::class, 'switchRole']);
+
 Route::post('/utilisateurs/import-csv', [UtilisateurController::class, 'importCsv']);
 
 

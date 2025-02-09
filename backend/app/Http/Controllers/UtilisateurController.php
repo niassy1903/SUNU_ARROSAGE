@@ -11,7 +11,9 @@ use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UtilisateurController extends Controller
+
 {
+    // Fonction pour enregistrer une action dans l'historique
     private function logAction($userId, $nom, $prenom, $action)
     {
         $now = Carbon::now();
@@ -24,7 +26,7 @@ class UtilisateurController extends Controller
             'heure' => $now->toTimeString(), // Enregistre l'heure
         ]);
     }
-
+        // Fonction pour créer un utilisateur
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -64,6 +66,7 @@ class UtilisateurController extends Controller
 
         return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
     }
+// Fonction pour lister tous les utilisateurs
 
     public function list()
     {
@@ -71,6 +74,7 @@ class UtilisateurController extends Controller
         return response()->json(['utilisateurs' => $utilisateurs], 200);
     }
 
+// Fonction pour supprimer un utilisateur
     public function delete($id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -84,6 +88,8 @@ class UtilisateurController extends Controller
         $utilisateur->delete();
         return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
+
+// Fonction pour supprimer plusieurs utilisateurs
 
     public function deleteMultiple(Request $request)
     {
@@ -109,6 +115,7 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateurs supprimés avec succès'], 200);
     }
 
+// Fonction pour mettre à jour un utilisateur
     public function update(Request $request, $id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -152,6 +159,7 @@ class UtilisateurController extends Controller
         ], 200);
     }
 
+// Fonction pour obtenir un utilisateur par ID
     public function getUtilisateur($id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -161,18 +169,21 @@ class UtilisateurController extends Controller
         return response()->json(['utilisateur' => $utilisateur], 200);
     }
 
+// Vérifier si le numéro de téléphone existe déjà pour un autre utilisateur
     public function checkTelephoneExists($telephone)
     {
         $exists = Utilisateur::where('telephone', $telephone)->exists();
         return response()->json(['exists' => $exists], 200);
     }
 
+    // Vérifier si la carte RFID existe déjà pour un autre utilisateur
     public function checkCarteRfidExists($carte_rfid)
     {
         $exists = Utilisateur::where('carte_rfid', $carte_rfid)->exists();
         return response()->json(['exists' => $exists], 200);
     }
 
+    // Générer un matricule unique pour les utilisateurs
     private function generateMatricule($role)
     {
         $prefix = $role === 'admin_simple' ? 'AS' : 'SP';
@@ -180,10 +191,13 @@ class UtilisateurController extends Controller
         return $prefix . '-' . $randomNumber;
     }
 
+    // Générer un code secret à 4 chiffres
     private function generateCodeSecret()
     {
         return str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
     }
+
+    // Fonction pour bloquer plusieurs utilisateurs
 
     public function blockMultiple(Request $request)
     {
@@ -209,6 +223,8 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateurs bloqués avec succès'], 200);
     }
 
+    // Fonction pour basculer entre 'admin_simple' et 'super_admin'
+
     public function switchRole(Request $request, $id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -227,46 +243,9 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Rôle mis à jour avec succès', 'utilisateur' => $utilisateur], 200);
     }
 
-    public function importCsv(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'csv_file' => 'required|mimes:csv,txt',
-        ]);
+  
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
-
-        $file = $request->file('csv_file');
-        $csvData = array_map('str_getcsv', file($file));
-        $header = array_shift($csvData);
-
-        $expectedHeader = ['nom', 'prenom', 'role', 'telephone', 'adresse', 'email', 'carte_rfid'];
-        if ($header !== $expectedHeader) {
-            return response()->json(['error' => 'L\'ordre des champs dans le CSV est incorrect. Veuillez suivre cet ordre : ' . implode(', ', $expectedHeader)], 400);
-        }
-
-        foreach ($csvData as $row) {
-            $data = array_combine($header, $row);
-            $utilisateur = Utilisateur::create([
-                'nom' => $data['nom'],
-                'prenom' => $data['prenom'],
-                'role' => $data['role'],
-                'telephone' => $data['telephone'],
-                'adresse' => $data['adresse'],
-                'email' => $data['email'],
-                'carte_rfid' => $data['carte_rfid'] ?? null,
-                'matricule' => $this->generateMatricule($data['role']),
-                'code_secret' => $this->generateCodeSecret(),
-            ]);
-
-            // Enregistrer l'action après l'importation de chaque utilisateur
-            $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Importation d\'utilisateur');
-        }
-
-        return response()->json(['message' => 'Utilisateurs importés avec succès'], 201);
-    }
-
+    // Fonction pour assigner une carte RFID à un utilisateur
     public function assigner_carte(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -300,6 +279,7 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Carte RFID assignée avec succès', 'utilisateur' => $utilisateur], 200);
     }
 
+    // Fonction pour se connecter par code secret
     public function loginByCode(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -332,6 +312,7 @@ class UtilisateurController extends Controller
         }
     }
     
+    // Fonction pour se déconnecter
 
     public function logout(Request $request)
     {
@@ -361,6 +342,8 @@ class UtilisateurController extends Controller
         }
     }
 
+
+//fonction pour se connecter avec la carte RFID
     public function loginByCard(Request $request)
 {
     $validator = Validator::make($request->all(), [
@@ -396,5 +379,53 @@ class UtilisateurController extends Controller
         return response()->json(['error' => 'Carte RFID non reconnue'], 401);
     }
 }
+
+
+public function importCsv(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'csv_file' => 'required|mimes:csv,txt',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    $file = $request->file('csv_file');
+    $csvData = array_map('str_getcsv', file($file));
+    $header = array_shift($csvData);
+
+    $expectedHeader = ['nom', 'prenom', 'role', 'telephone', 'adresse', 'email', 'carte_rfid'];
+    if ($header !== $expectedHeader) {
+        return response()->json(['error' => 'L\'ordre des champs dans le CSV est incorrect. Veuillez suivre cet ordre : ' . implode(', ', $expectedHeader)], 400);
+    }
+
+    foreach ($csvData as $row) {
+        // Vérifiez que chaque ligne a le même nombre de colonnes que l'en-tête
+        if (count($row) !== count($header)) {
+            return response()->json(['error' => 'Le fichier CSV contient des lignes avec un nombre incorrect de colonnes.'], 400);
+        }
+
+        $data = array_combine($header, $row);
+        $utilisateur = Utilisateur::create([
+            'nom' => $data['nom'],
+            'prenom' => $data['prenom'],
+            'role' => $data['role'],
+            'telephone' => $data['telephone'],
+            'adresse' => $data['adresse'],
+            'email' => $data['email'],
+            'carte_rfid' => $data['carte_rfid'] ?? null,
+            'matricule' => $this->generateMatricule($data['role']),
+            'code_secret' => $this->generateCodeSecret(),
+        ]);
+
+        // Enregistrer l'action après l'importation de chaque utilisateur
+        $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Importation d\'utilisateur');
+    }
+
+    return response()->json(['message' => 'Utilisateurs importés avec succès'], 201);
+}
+
+
 
 }

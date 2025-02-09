@@ -72,12 +72,13 @@ export class UtilisateurService {
     return this.http.post(`${this.apiUrl}/switch-role/${id}`, { userId });
   }
 
-  // Importer des utilisateurs via CSV
-  /*importCsv(formData: FormData): Observable<any> {
-    const userId = localStorage.getItem('userId'); // Récupérer l'ID de l'utilisateur connecté
-    formData.append('userId', userId);
+
+//importer un fichier CSV
+  importCsv(formData: FormData): Observable<any> {
+    const userId = localStorage.getItem('userId') || ''; // Utiliser une chaîne vide si userId est null
+    formData.append('userId', userId); // userId sera toujours une chaîne
     return this.http.post(`${this.apiUrl}/import-csv`, formData);
-  }*/
+  }
 
   // Assigner une carte à un utilisateur
   assignCard(id: string, carteRfid: string): Observable<any> {
