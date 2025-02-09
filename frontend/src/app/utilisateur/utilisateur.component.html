@@ -145,18 +145,18 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>Placer la carte sur le capteur RDId pour lui assigner une carte</p>
-        <input type="text" class="form-control" id="carte_rfid_modal" placeholder="Carte RFID" [(ngModel)]="carte_rfid_modal" name="carte_rfid_modal" required>
+        <p>Placer la carte sur le capteur RFID pour lui assigner une carte</p>
+        <input type="text" class="form-control" id="carte_rfid_modal" placeholder="Carte RFID" [(ngModel)]="carte_rfid_modal" name="carte_rfid_modal" required readonly>
         <div *ngIf="carteRfidModalError" class="text-danger">{{ carteRfidModalError }}</div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
         <button type="button" class="btn btn-primary" (click)="assignCard()">Assigner</button>
-
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal pour voir le profil -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
@@ -199,7 +199,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary" (click)="importCsv()">Importer</button>
+        <!--<button type="button" class="btn btn-primary" (click)="importCsv()">Importer</button> -->
       </div>
     </div>
   </div>

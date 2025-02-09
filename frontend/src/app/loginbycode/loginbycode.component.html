@@ -49,8 +49,13 @@
             [(ngModel)]="maskedDigits[i]">
         </div>
         
-        <!-- Affichage conditionnel du message d'erreur -->
-        <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+        <!-- Affichage du message d'erreur principal -->
+        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+        
+        <!-- Section pour les messages d'erreur supplémentaires -->
+        <div *ngIf="additionalErrors.length > 0" class="additional-errors">
+          <p *ngFor="let error of additionalErrors" class="error-detail">{{ error }}</p>
+        </div>
       </ng-container>
     </div>
     

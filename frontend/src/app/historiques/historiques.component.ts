@@ -11,14 +11,13 @@ import { HttpClientModule } from '@angular/common/http';
   standalone: true,
   imports: [CommonModule, NavbarComponent, SidebarComponent, FormsModule, HttpClientModule],
   templateUrl: './historiques.component.html',
-  styleUrl: './historiques.component.css',
+  styleUrls: ['./historiques.component.css'],
   providers: [UtilisateurService],
 })
 export class HistoriquesComponent implements OnInit {
   historiques: any[] = [];  // Assurer que c'est bien un tableau vide au départ
   page: number = 1;
   itemsPerPage: number = 5;
-  selectedUserId: string = ''; // Pour filtrer par utilisateur
   selectedDate: string = ''; // Pour filtrer par date
 
   constructor(private utilisateurService: UtilisateurService) {}
@@ -42,21 +41,6 @@ export class HistoriquesComponent implements OnInit {
       }
     });
   }
-  
-
-  // Charger les historiques d'un utilisateur spécifique
-  loadHistoriquesByUser(): void {
-    if (this.selectedUserId) {
-      this.utilisateurService.getHistoriquesByUser(this.selectedUserId).subscribe({
-        next: (data) => {
-          this.historiques = Array.isArray(data) ? data : [];
-        },
-        error: (error) => {
-          console.error("Erreur lors du chargement des historiques de l'utilisateur :", error);
-        }
-      });
-    }
-  }
 
   // Charger les historiques filtrés par date
   filterHistoriquesByDate(): void {
@@ -64,12 +48,29 @@ export class HistoriquesComponent implements OnInit {
       this.utilisateurService.filterHistoriquesByDate(this.selectedDate).subscribe({
         next: (data) => {
           this.historiques = Array.isArray(data) ? data : [];
+          if (this.historiques.length === 0) {
+            console.log("Aucune information à ce jour.");
+          }
         },
         error: (error) => {
           console.error("Erreur lors du filtrage des historiques par date :", error);
         }
       });
     }
+  }
+
+  // Gérer l'input de la date
+  onDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value === '') {
+      this.resetFilters();
+    }
+  }
+
+  // Réinitialiser les filtres
+  resetFilters(): void {
+    this.selectedDate = '';
+    this.loadHistoriques();
   }
 
   get paginatedHistorique() {

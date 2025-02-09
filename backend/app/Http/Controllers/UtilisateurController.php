@@ -10,8 +10,6 @@ use App\Notifications\CodeSecretNotification;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-
-
 class UtilisateurController extends Controller
 {
     private function logAction($userId, $nom, $prenom, $action)
@@ -26,6 +24,7 @@ class UtilisateurController extends Controller
             'heure' => $now->toTimeString(), // Enregistre l'heure
         ]);
     }
+
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -36,16 +35,6 @@ class UtilisateurController extends Controller
             'adresse' => 'required|string|max:255',
             'carte_rfid' => 'nullable|string|max:255|unique:utilisateurs',
             'email' => 'required|email|unique:utilisateurs',
-        ], [
-            'nom.required' => 'Le nom est requis.',
-            'prenom.required' => 'Le prénom est requis.',
-            'role.required' => 'Le rôle est requis.',
-            'telephone.required' => 'Le numéro de téléphone est requis.',
-            'telephone.unique' => 'Ce numéro de téléphone existe déjà.',
-            'adresse.required' => 'L\'adresse est requise.',
-            'carte_rfid.unique' => 'Cette carte RFID existe déjà.',
-            'email.required' => 'L\'email est requis.',
-            'email.unique' => 'Cet email existe déjà.',
         ]);
 
         if ($validator->fails()) {
@@ -71,7 +60,7 @@ class UtilisateurController extends Controller
         $utilisateur->notify(new CodeSecretNotification($code_secret, $request->prenom, $request->nom));
 
         // Enregistrer l'action
-        $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Création d\'utilisateur');
+        $this->logAction($request->userId, $utilisateur->nom, $utilisateur->prenom, 'Création d\'utilisateur');
 
         return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
     }
@@ -162,7 +151,6 @@ class UtilisateurController extends Controller
             'utilisateur' => $utilisateur
         ], 200);
     }
-    
 
     public function getUtilisateur($id)
     {
@@ -315,7 +303,7 @@ class UtilisateurController extends Controller
     public function loginByCode(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code_secret' => 'required|numeric|digits:4',  
+            'code_secret' => 'required|numeric|digits:4',
         ]);
     
         if ($validator->fails()) {
@@ -328,11 +316,12 @@ class UtilisateurController extends Controller
         if ($utilisateur) {
             // Générer un token JWT pour l'utilisateur
             $token = JWTAuth::fromUser($utilisateur);
-            
+    
             return response()->json([
                 'message' => 'Connexion réussie',
                 'token' => $token,
                 'user' => [
+                    'id' => $utilisateur->id, // Inclure l'ID de l'utilisateur
                     'nom' => $utilisateur->nom,
                     'prenom' => $utilisateur->prenom,
                     'role' => $utilisateur->role
@@ -347,22 +336,22 @@ class UtilisateurController extends Controller
     public function logout(Request $request)
     {
         $token = $request->bearerToken();
-    
+
         if (!$token) {
             return response()->json(['error' => 'Token non fourni'], 400);
         }
-    
+
         try {
             // Optionnel : vérifier si le token est valide avant d'invalider
             $tokenPayload = JWTAuth::setToken($token)->getPayload();
-    
+
             if ($tokenPayload) {
                 JWTAuth::invalidate($token);
                 return response()->json(['message' => 'Déconnexion réussie'], 200);
             }
-    
+
             return response()->json(['error' => 'Token invalide ou expiré'], 401);
-            
+
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'Le token est déjà expiré'], 401);
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
@@ -371,5 +360,41 @@ class UtilisateurController extends Controller
             return response()->json(['error' => 'Impossible d\'invalider le token'], 500);
         }
     }
+
+    public function loginByCard(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'carte_rfid' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    $carte_rfid = $request->input('carte_rfid');
+    $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
+
+    if ($utilisateur) {
+        if ($utilisateur->status === 'inactif') {
+            return response()->json(['error' => 'Compte bloqué'], 403);
+        }
+
+        // Générer un token JWT pour l'utilisateur
+        $token = JWTAuth::fromUser($utilisateur);
+
+        return response()->json([
+            'message' => 'Connexion réussie',
+            'token' => $token,
+            'user' => [
+                'id' => $utilisateur->id,
+                'nom' => $utilisateur->nom,
+                'prenom' => $utilisateur->prenom,
+                'role' => $utilisateur->role
+            ]
+        ], 200);
+    } else {
+        return response()->json(['error' => 'Carte RFID non reconnue'], 401);
+    }
+}
 
 }

@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']); //connexion
 Route::post('/logout', [UtilisateurController::class, 'logout']); //déconnexion
+Route::post('/login-by-card', [UtilisateurController::class, 'loginByCard']);
 
 
 // routes/api.php

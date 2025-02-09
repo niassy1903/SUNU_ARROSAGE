@@ -78,7 +78,7 @@ app.get('/api/sensors/light', (req, res) => {
 });
 
 // Mise à jour des données toutes les 5 secondes
-setInterval(fetchSensorData, 5000);
+setInterval(fetchSensorData, 2000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Serveur API actif sur http://localhost:${PORT}`);

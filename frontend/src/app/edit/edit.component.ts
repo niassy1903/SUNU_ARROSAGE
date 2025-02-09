@@ -10,7 +10,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 declare var $: any;
 
 interface User {
-  _id: string;
+  id: string;
   nom: string;
   prenom: string;
   email: string;
@@ -32,7 +32,7 @@ interface User {
 })
 export class EditComponent implements OnInit {
   user: User = {
-    _id: '',
+    id: '',
     nom: '',
     prenom: '',
     email: '',
@@ -69,7 +69,7 @@ export class EditComponent implements OnInit {
   }
 
   updateUser(): void {
-    this.utilisateurService.updateUtilisateur(this.user._id, this.user).subscribe(
+    this.utilisateurService.updateUtilisateur(this.user.id, this.user).subscribe(
       (response) => {
         console.log('Utilisateur mis à jour avec succès', response);
         $('#updateConfirmationModal').modal('hide');
@@ -82,7 +82,7 @@ export class EditComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.utilisateurService.updateUtilisateur(this.user._id, this.user).subscribe(
+    this.utilisateurService.updateUtilisateur(this.user.id, this.user).subscribe(
       (response) => {
         console.log('Utilisateur mis à jour avec succès', response);
         this.router.navigate(['/utilisateur']);
