@@ -13,11 +13,14 @@ import { IrrigationData,IrrigationService } from '../services/irrigation.service
 import { TimeCountdownPipePipe } from '../pipes/time-countdown.pipe.pipe';
 import { Subscription } from 'rxjs';
 import { SensorDataService } from '../sensor-data.service'; // Importer le service
+import { PompeService } from '../services/pompe.service'; // Importer le service
+
+
 
 @Component({
   selector: 'app-dashbord',
   standalone: true,
-  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe],
+  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,TimeCountdownPipePipe,CurrentTimePipe],
   templateUrl: './dashbord.component.html',
   styleUrl: './dashbord.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +36,9 @@ export class DashbordComponent implements OnInit {
 
   private sensorDataSubscription: Subscription | undefined;
   private sensorDataInterval: any;
+  
+
+  isPompeOn: boolean = false;
  
 
   startTime: string = '';
@@ -44,7 +50,7 @@ export class DashbordComponent implements OnInit {
   private timerInterval: any;
   private destroyed = false;
   constructor(private irrigationService: IrrigationService,
-    private PlaningService:PlaningService,
+    private PlaningService:PlaningService,private PompeService:PompeService,
     private cdr: ChangeDetectorRef, private sensorDataService: SensorDataService
     
   ) {}
@@ -54,6 +60,9 @@ export class DashbordComponent implements OnInit {
     this.loadSchedules();
     this.fetchSensorData();
     this.sensorDataInterval = setInterval(() => this.fetchSensorData(), 2000);
+    this.PompeService.pumpState$.subscribe(
+      state => this.isPompeOn = state
+    );
   
   }
 
@@ -277,6 +286,24 @@ createLuminosityChart(labels: string[], data: number[]) {
   
   // Fonction pour mettre à jour la date et l'heure actuelles
  
+  togglePompe() {
+    const newState = !this.isPompeOn;
+    this.PompeService.togglePump(newState).subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('Pompe état changé:', response.state);
+          // L'état sera mis à jour via le BehaviorSubject dans le service
+        } else {
+          console.error('Erreur lors du changement d\'état');
+          this.isPompeOn = !newState; // Revenir à l'état précédent en cas d'erreur
+        }
+      },
+      error: (error) => {
+        console.error('Erreur:', error);
+        this.isPompeOn = !newState; // Revenir à l'état précédent en cas d'erreur
+      }
+    });
   
-  
+}
+
 }

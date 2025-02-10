@@ -1,11 +1,26 @@
-// server.js
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const Irrigation = require('./model/irrigation');
 const Schedule = require('./model/planing');
+const PumpState = require('./model/pumpState');
+const { Client } = require('ssh2');
+
+
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+const raspberryPiConfig = {
+  host: '192.168.1.26',
+  port: 22,
+  username: 'antamaguette',
+  password: 'antamaguette'
+};
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -15,6 +30,38 @@ mongoose.connect('mongodb://localhost:27017/sunuarrosage', {
 })
 .then(() => console.log("Connexion à MongoDB réussie !"))
 .catch(err => console.error("Erreur de connexion à MongoDB", err));
+
+io.on('connection', (socket) => {
+  console.log('Un client s\'est connecté');
+
+  const conn = new Client();
+  conn.on('ready', () => {
+    console.log("Connexion SSH établie avec le Raspberry Pi !");
+
+    const command = 'python3 /home/antamaguette/ardi.py';
+
+    conn.exec(command, (err, stream) => {
+      if (err) {
+        conn.end();
+        return;
+      }
+
+      stream.on('data', (data) => {
+        const sensorData = data.toString();
+        console.log(`Données du capteur : ${sensorData}`);
+        socket.emit('sensorData', sensorData);
+      });
+
+      stream.on('close', () => {
+        conn.end();
+      });
+    });
+  }).connect(raspberryPiConfig);
+
+  socket.on('disconnect', () => {
+    console.log('Un client s\'est déconnecté');
+  });
+});
 
 // Fonction pour calculer les moyennes quotidiennes
 const calculerMoyennesQuotidiennes = async (date) => {
@@ -42,15 +89,15 @@ const calculerMoyennesQuotidiennes = async (date) => {
   };
 
   // Calcul des moyennes avec les données existantes plus la nouvelle
-  const totalHumiditer = donneesJournee.reduce((sum, entry) => 
+  const totalHumiditer = donneesJournee.reduce((sum, entry) =>
     sum + extraireNombre(entry.humiditer), 0
   );
-  
-  const totalLuminositer = donneesJournee.reduce((sum, entry) => 
+
+  const totalLuminositer = donneesJournee.reduce((sum, entry) =>
     sum + extraireNombre(entry.luminositer), 0
   );
-  
-  const totalVolumeArroser = donneesJournee.reduce((sum, entry) => 
+
+  const totalVolumeArroser = donneesJournee.reduce((sum, entry) =>
     sum + (entry.volume_arroser || 0), 0
   );
 
@@ -82,7 +129,7 @@ const calculerMoyennesQuotidiennes = async (date) => {
 app.post('/api/irrigation', async (req, res) => {
   try {
     const irrigationData = req.body;
-    
+
     // D'abord, sauvegarder la nouvelle entrée
     const newIrrigation = new Irrigation(irrigationData);
     await newIrrigation.save();
@@ -101,8 +148,6 @@ app.post('/api/irrigation', async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de l\'ajout des données', error: err });
   }
 });
-
-
 
 // Route pour obtenir toutes les entrées d'irrigation
 app.get('/api/irrigation', async (req, res) => {
@@ -158,8 +203,149 @@ app.delete('/api/schedule/:id', async (req, res) => {
   }
 });
 
-//port dans lequel demarre le serveur
+// Route pour stocker le statut d'humidité
+let currentHumidityStatus = {
+  status: 'sec',
+  lastUpdated: new Date()
+};
+
+app.post('/api/humidity-status', (req, res) => {
+  const { status } = req.body;
+  currentHumidityStatus = {
+      status: status,
+      lastUpdated: new Date()
+  };
+  res.json(currentHumidityStatus);
+});
+
+// Route pour récupérer le statut d'humidité
+app.get('/api/humidity-status', (req, res) => {
+  res.json(currentHumidityStatus);
+});
+
+// Route pour contrôler la pompe via le Raspberry Pi
+app.post('/api/pump/control', async (req, res) => {
+  try {
+    const { state } = req.body;
+    if (state !== "on" && state !== "off") {
+      return res.status(400).json({ error: "État invalide. Utilisez 'on' ou 'off'." });
+    }
+
+    const newPumpState = state === "on";
+
+    // Créer une nouvelle entrée d'état
+    const pumpStateEntry = new PumpState({
+      state: newPumpState
+    });
+
+    const conn = new Client();
+
+    conn.on('ready', () => {
+      console.log("✅ Connexion SSH établie avec le Raspberry Pi !");
+
+      const command = `python3 /home/antamaguette/pump.py ${state}`;
+
+      conn.exec(command, async (err, stream) => {
+        if (err) {
+          conn.end();
+          return res.status(500).json({ error: "Erreur lors de l'exécution du script." });
+        }
+
+        let output = '';
+        stream.on('data', (data) => {
+          output += data.toString();
+        });
+
+        stream.on('close', async () => {
+          conn.end();
+          console.log(`🔹 Résultat du script : ${output.trim()}`);
+
+          // Sauvegarder l'état dans MongoDB
+          await pumpStateEntry.save();
+
+          res.json({
+            message: output.trim(),
+            state: newPumpState,
+            success: true
+          });
+        });
+      });
+    }).on('error', (err) => {
+      console.error("❌ Erreur de connexion SSH :", err);
+      res.status(500).json({ error: "Impossible de se connecter au Raspberry Pi." });
+    }).connect(raspberryPiConfig);
+
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors du contrôle de la pompe",
+      success: false
+    });
+  }
+});
+
+// Route pour obtenir l'état actuel de la pompe
+app.get('/api/pump/state', async (req, res) => {
+  try {
+    const latestState = await PumpState.findOne().sort({ timestamp: -1 });
+    res.json({
+      pumpState: latestState ? latestState.state : false,
+      success: true
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors de la récupération de l'état de la pompe",
+      success: false
+    });
+  }
+});
+
+// Route optionnelle pour obtenir l'historique des états de la pompe
+app.get('/api/pump/history', async (req, res) => {
+  try {
+    const history = await PumpState.find()
+      .sort({ timestamp: -1 })
+      .limit(10); // Limiter aux 10 derniers changements d'état
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors de la récupération de l'historique",
+      success: false
+    });
+  }
+});
+
+// Route pour obtenir les données des capteurs
+app.get('/api/sensor-data', (req, res) => {
+  const conn = new Client();
+  conn.on('ready', () => {
+    console.log("Connexion SSH établie avec le Raspberry Pi !");
+
+    const command = 'python3 /home/antamaguette/ardi.py';
+
+    conn.exec(command, (err, stream) => {
+      if (err) {
+        conn.end();
+        return res.status(500).json({ error: "Erreur lors de l'exécution du script." });
+      }
+
+      stream.on('data', (data) => {
+        console.log(`Données du capteur : ${data.toString()}`);
+        res.write(`data: ${data.toString()}\n\n`);
+      });
+
+      stream.on('close', () => {
+        conn.end();
+        res.end();
+      });
+    });
+  }).on('error', (err) => {
+    console.error("Erreur de connexion SSH :", err);
+    res.status(500).json({ error: "Impossible de se connecter au Raspberry Pi." });
+  }).connect(raspberryPiConfig);
+});
+
+// Port sur lequel démarre le serveur
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
 });

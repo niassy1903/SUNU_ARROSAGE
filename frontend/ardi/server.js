@@ -11,14 +11,14 @@ app.use(cors());
 
 // Configuration SSH
 const sshConfig = {
-  host: '192.168.1.20',
+  host: '192.168.1.26',
   port: 22,
-  username: 'niassy',
-  password: 'niassy1903'
+  username: 'antamaguette',
+  password: 'antamaguette'
 };
 
 // Commande à exécuter sur le Raspberry Pi
-const command = 'python3 /home/niassy/ardi.py';
+const command = 'python3 /home/antamaguette/ardi.py';
 
 let sensorData = { humidity: null, light: null, waterLevel: null }; // Ajouter un niveau d'eau
 
