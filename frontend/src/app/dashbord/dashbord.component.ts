@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy,Component, OnInit } from '@angular/core';
 import Chart from 'chart.js/auto';
-import { io, Socket } from 'socket.io-client';
+import { SensorComponent } from '../sensor/sensor.component';
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,11 +14,15 @@ import { IrrigationData,IrrigationService } from '../services/irrigation.service
 import { TimeCountdownPipePipe } from '../pipes/time-countdown.pipe.pipe';
 import { PompeService } from '../services/pompe.service';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import { FormatSensorDataPipe } from '../format-sensor-data.pipe';
+import { Subscription } from 'rxjs';
+import { SensorServiceTsService } from '../services/sensor.service.ts.service';
+
+import { CapteurPipe } from '../pipes/capteur.pipe';
+
 @Component({
   selector: 'app-dashbord',
   standalone: true,
-  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe,FormatSensorDataPipe],
+  imports: [SidebarComponent, NavbarComponent, HttpClientModule,FormsModule,CommonModule,CurrentTimePipe,TimeCountdownPipePipe,SensorComponent,CapteurPipe],
   templateUrl: './dashbord.component.html',
   styleUrl: './dashbord.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,15 +39,16 @@ export class DashbordComponent implements OnInit {
   countdown: string = '';
   currentDateTime: string = ''; 
   private timerInterval: any;
-  humidity: string = '0%';
-  luminosity: string = '0 lx';
-  private socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
+  
+  private sensorDataSubscription: Subscription | null = null;
+
   private destroyed = false;
   isPompeOn: boolean = false;
 
   constructor(private irrigationService: IrrigationService,
     private PlaningService:PlaningService,
     private PompeService:PompeService,
+   
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -54,12 +59,8 @@ export class DashbordComponent implements OnInit {
     this.PompeService.pumpState$.subscribe(
       state => this.isPompeOn = state
     );
-    this.socket.on('sensorData', (data) => {
-      console.log('Données du capteur reçues :', data);
-      this.humidity = data; // Pas besoin de formater ici, le pipe s'en chargera
-      this.luminosity = data; // Pas besoin de formater ici, le pipe s'en chargera
-      this.cdr.detectChanges();
-    });
+    
+   
   }
 
  

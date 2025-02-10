@@ -1,9 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 @Pipe({
-  name: 'formatSensorData',
+  name: 'capteur',
   standalone: true
 })
-export class FormatSensorDataPipe implements PipeTransform {
+export class CapteurPipe implements PipeTransform {
   transform(value: string, type: string): string {
     if (!value) return '0';
 
@@ -16,4 +17,5 @@ export class FormatSensorDataPipe implements PipeTransform {
         return value;
     }
   }
+
 }

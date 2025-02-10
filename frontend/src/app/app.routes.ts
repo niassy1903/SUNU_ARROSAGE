@@ -8,6 +8,7 @@ import { DashbordComponent } from './dashbord/dashbord.component';
 import { EditComponent } from './edit/edit.component';
 import { LoginbycodeComponent } from './loginbycode/loginbycode.component';
 
+import { SensorComponent } from './sensor/sensor.component';
 
 export const routes: Routes = [
     {path: 'utilisateur', component: UtilisateurComponent},
@@ -16,6 +17,7 @@ export const routes: Routes = [
     {path: 'inscription', component: InscriptionComponent},
     {path: 'historiques',component: HistoriquesComponent},
     {path: 'dashbord',component: DashbordComponent},
+    {path: 'sensor',component: SensorComponent},
     {path: 'edit/:id', component: EditComponent},
     { path: '', redirectTo: 'loginbycode', pathMatch: 'full' },
     {path: 'loginbycode', component: LoginbycodeComponent},

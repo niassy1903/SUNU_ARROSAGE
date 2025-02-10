@@ -1,0 +1,13 @@
+<ng-container *ngIf="sensorData$ | async as data">
+    <div class="stat-box">
+      <img src="humidite.png" class="stat-icon" alt="Humidité">
+      <p class="stat-title green">Humidité du sol</p>
+      <div class="stat-value">{{ data.humidity | capteur:'humidity' }}</div>
+    </div>
+    
+    <div class="stat-box">
+      <img src="luminosite-et-contraste.png" class="stat-icon" alt="Luminosité">
+      <p class="stat-title yellow">Luminosité du sol</p>
+      <div class="stat-value">{{ data.luminosity | capteur:'luminosity' }}</div>
+    </div>
+  </ng-container>

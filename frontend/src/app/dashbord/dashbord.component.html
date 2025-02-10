@@ -33,13 +33,13 @@
             <div class="stat-box">
               <img src="humidite.png" class="stat-icon" alt="Humidité">
               <p class="stat-title green">Humidité du sol</p>
-              <div class="stat-value">{{ humidity | formatSensorData:'humidity' }}</div>
+              <div class="stat-value">{{ '' | capteur:'humidity' }}</div>
             </div>
             
             <div class="stat-box">
               <img src="luminosite-et-contraste.png" class="stat-icon" alt="Luminosité">
               <p class="stat-title yellow">Luminosité du sol</p>
-              <div class="stat-value">{{ luminosity | formatSensorData:'luminosity' }}</div>
+              <div class="stat-value">{{ ''| capteur:'luminosity' }}</div>
             </div>
             <div class="stat-box">
               <img src="verre.png" class="stat-icon" alt="Volume d'eau">
