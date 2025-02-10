@@ -4,11 +4,10 @@ const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { Client } = require('ssh2');
 const Irrigation = require('./model/irrigation');
 const Schedule = require('./model/planing');
 const PumpState = require('./model/pumpState');
-const { Client } = require('ssh2');
-
 
 const app = express();
 const server = http.createServer(app);
@@ -63,7 +62,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Fonction pour calculer les moyennes quotidiennes
 const calculerMoyennesQuotidiennes = async (date) => {
   const debutJournee = new Date(date);
   debutJournee.setHours(0, 0, 0, 0);
@@ -71,7 +69,6 @@ const calculerMoyennesQuotidiennes = async (date) => {
   const finJournee = new Date(date);
   finJournee.setHours(23, 59, 59, 999);
 
-  // Récupérer toutes les données de la journée jusqu'à maintenant
   const donneesJournee = await Irrigation.find({
     date_arrosage: { $gte: debutJournee, $lte: finJournee }
   });
@@ -88,7 +85,6 @@ const calculerMoyennesQuotidiennes = async (date) => {
     return parseFloat(str.replace('%', '')) || 0;
   };
 
-  // Calcul des moyennes avec les données existantes plus la nouvelle
   const totalHumiditer = donneesJournee.reduce((sum, entry) =>
     sum + extraireNombre(entry.humiditer), 0
   );
@@ -101,12 +97,10 @@ const calculerMoyennesQuotidiennes = async (date) => {
     sum + (entry.volume_arroser || 0), 0
   );
 
-  // Calcul des nouvelles moyennes
   const moyenneHumiditer = Number((totalHumiditer / donneesJournee.length).toFixed(2));
   const moyenneLuminositer = Number((totalLuminositer / donneesJournee.length).toFixed(2));
   const moyenneVolumeArroser = Number((totalVolumeArroser / donneesJournee.length).toFixed(2));
 
-  // Mettre à jour toutes les entrées de la journée avec les nouvelles moyennes
   await Irrigation.updateMany(
     { date_arrosage: { $gte: debutJournee, $lte: finJournee } },
     {
@@ -125,19 +119,14 @@ const calculerMoyennesQuotidiennes = async (date) => {
   };
 };
 
-// Route pour créer une nouvelle entrée d'irrigation
 app.post('/api/irrigation', async (req, res) => {
   try {
     const irrigationData = req.body;
-
-    // D'abord, sauvegarder la nouvelle entrée
     const newIrrigation = new Irrigation(irrigationData);
     await newIrrigation.save();
 
-    // Ensuite, recalculer les moyennes pour la journée
     const moyennes = await calculerMoyennesQuotidiennes(newIrrigation.date_arrosage);
 
-    // La réponse inclut l'entrée avec les moyennes mises à jour
     res.status(201).json({
       ...newIrrigation.toObject(),
       moyenne_humiditer: moyennes.moyenneHumiditer,
@@ -149,7 +138,6 @@ app.post('/api/irrigation', async (req, res) => {
   }
 });
 
-// Route pour obtenir toutes les entrées d'irrigation
 app.get('/api/irrigation', async (req, res) => {
   try {
     const irrigationData = await Irrigation.find();
@@ -159,27 +147,17 @@ app.get('/api/irrigation', async (req, res) => {
   }
 });
 
-// Route pour ajouter un horaire de planification
 app.post('/api/schedule', async (req, res) => {
   try {
     const { startTime, endTime } = req.body;
-
-    // Créer un nouvel horaire
-    const newSchedule = new Schedule({
-      startTime,
-      endTime
-    });
-
-    // Sauvegarder dans la base de données
+    const newSchedule = new Schedule({ startTime, endTime });
     await newSchedule.save();
-
     res.status(201).json(newSchedule);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de l\'ajout de l\'horaire', error: err });
   }
 });
 
-// Route pour récupérer tous les horaires de planification
 app.get('/api/schedule', async (req, res) => {
   try {
     const schedules = await Schedule.find();
@@ -189,21 +167,16 @@ app.get('/api/schedule', async (req, res) => {
   }
 });
 
-// Route pour supprimer un horaire de planification
 app.delete('/api/schedule/:id', async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Supprimer l'horaire par son ID
     await Schedule.findByIdAndDelete(id);
-
     res.status(200).json({ message: 'Horaire supprimé avec succès' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression de l\'horaire', error: err });
   }
 });
 
-// Route pour stocker le statut d'humidité
 let currentHumidityStatus = {
   status: 'sec',
   lastUpdated: new Date()
@@ -218,12 +191,10 @@ app.post('/api/humidity-status', (req, res) => {
   res.json(currentHumidityStatus);
 });
 
-// Route pour récupérer le statut d'humidité
 app.get('/api/humidity-status', (req, res) => {
   res.json(currentHumidityStatus);
 });
 
-// Route pour contrôler la pompe via le Raspberry Pi
 app.post('/api/pump/control', async (req, res) => {
   try {
     const { state } = req.body;
@@ -232,14 +203,9 @@ app.post('/api/pump/control', async (req, res) => {
     }
 
     const newPumpState = state === "on";
-
-    // Créer une nouvelle entrée d'état
-    const pumpStateEntry = new PumpState({
-      state: newPumpState
-    });
+    const pumpStateEntry = new PumpState({ state: newPumpState });
 
     const conn = new Client();
-
     conn.on('ready', () => {
       console.log("✅ Connexion SSH établie avec le Raspberry Pi !");
 
@@ -260,7 +226,6 @@ app.post('/api/pump/control', async (req, res) => {
           conn.end();
           console.log(`🔹 Résultat du script : ${output.trim()}`);
 
-          // Sauvegarder l'état dans MongoDB
           await pumpStateEntry.save();
 
           res.json({
@@ -283,7 +248,6 @@ app.post('/api/pump/control', async (req, res) => {
   }
 });
 
-// Route pour obtenir l'état actuel de la pompe
 app.get('/api/pump/state', async (req, res) => {
   try {
     const latestState = await PumpState.findOne().sort({ timestamp: -1 });
@@ -299,12 +263,11 @@ app.get('/api/pump/state', async (req, res) => {
   }
 });
 
-// Route optionnelle pour obtenir l'historique des états de la pompe
 app.get('/api/pump/history', async (req, res) => {
   try {
     const history = await PumpState.find()
       .sort({ timestamp: -1 })
-      .limit(10); // Limiter aux 10 derniers changements d'état
+      .limit(10);
     res.json(history);
   } catch (err) {
     res.status(500).json({
@@ -314,7 +277,6 @@ app.get('/api/pump/history', async (req, res) => {
   }
 });
 
-// Route pour obtenir les données des capteurs
 app.get('/api/sensor-data', (req, res) => {
   const conn = new Client();
   conn.on('ready', () => {
@@ -344,7 +306,69 @@ app.get('/api/sensor-data', (req, res) => {
   }).connect(raspberryPiConfig);
 });
 
-// Port sur lequel démarre le serveur
+let sensorData = { humidity: null, light: null, waterLevel: null };
+
+function fetchSensorData() {
+  const conn = new Client();
+  conn.on('ready', () => {
+    console.log('✅ Connecté au Raspberry Pi');
+
+    const command = 'python3 /home/antamaguette/ardi.py';
+
+    conn.exec(command, (err, stream) => {
+      if (err) {
+        console.error('❌ Erreur SSH:', err);
+        conn.end();
+        return;
+      }
+
+      stream.on('close', () => {
+        console.log('🔌 Connexion SSH fermée.');
+        conn.end();
+      });
+
+      stream.on('data', (data) => {
+        const output = data.toString().trim();
+        console.log('📊 Données reçues:', output);
+
+        const regex = /Humidité : (\d+)%.*Luminosité : (\d+)%.*Niveau d\'eau : (\d+)%/s;
+        const matches = output.match(regex);
+
+        if (matches) {
+          sensorData = {
+            humidity: parseInt(matches[1], 10),
+            light: parseInt(matches[2], 10),
+            waterLevel: parseInt(matches[3], 10)
+          };
+        }
+      });
+
+      stream.stderr.on('data', (data) => {
+        console.error('🚨 Erreur du script:', data.toString());
+      });
+    });
+
+  }).connect(raspberryPiConfig);
+}
+
+app.get('/api/sensors', (req, res) => {
+  res.json(sensorData);
+});
+
+app.get('/api/sensors/humidity', (req, res) => {
+  res.json({ humidity: sensorData.humidity });
+});
+
+app.get('/api/sensors/light', (req, res) => {
+  res.json({ light: sensorData.light });
+});
+
+app.get('/api/sensors/waterLevel', (req, res) => {
+  res.json({ waterLevel: sensorData.waterLevel });
+});
+
+setInterval(fetchSensorData, 2000);
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);

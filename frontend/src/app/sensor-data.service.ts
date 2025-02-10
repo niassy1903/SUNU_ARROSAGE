@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SensorDataService {
-  private apiUrl = 'http://localhost:3000/api/sensors'; // Endpoint général
-  private waterLevelUrl = 'http://localhost:3000/api/sensors/waterLevel'; // Endpoint pour le niveau d'eau
+  private apiUrl = 'http://localhost:5000/api/sensors'; // Endpoint général
+  private waterLevelUrl = 'http://localhost:5000/api/sensors/waterLevel'; // Endpoint pour le niveau d'eau
 
   constructor(private http: HttpClient) {}
 
