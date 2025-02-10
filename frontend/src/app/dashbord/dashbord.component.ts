@@ -60,9 +60,7 @@ export class DashbordComponent implements OnInit {
     this.loadSchedules();
     this.fetchSensorData();
     this.sensorDataInterval = setInterval(() => this.fetchSensorData(), 2000);
-    this.PompeService.pumpState$.subscribe(
-      state => this.isPompeOn = state
-    );
+   
   
   }
 
@@ -304,6 +302,26 @@ createLuminosityChart(labels: string[], data: number[]) {
       }
     });
   
+}
+
+//envoyer les donnerr en alument la pompe
+envoyerDonnees() {
+  const irrigationData = {
+    humiditer: this.humidity,
+    luminositer: this.luminosity,
+    volume_arroser: this.volumeEau, // Ajout du volume d'eau
+    type_arrosage: 'manuelle',
+    pumpState: this.isPompeOn // Ajout de l'état de la pompe
+  };
+
+  this.irrigationService.envoyerIrrigation(irrigationData).subscribe(
+    response => {
+      console.log('Irrigation envoyée avec succès', response);
+    },
+    error => {
+      console.error('Erreur lors de l’envoi des données', error);
+    }
+  );
 }
 
 }

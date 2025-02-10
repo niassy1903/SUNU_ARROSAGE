@@ -8,7 +8,7 @@ import { tap, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PompeService {
-  private raspberryPiUrl = 'http://localhost:5000';
+  private raspberryPiUrl = 'http://localhost:5001';
   private pumpStateSubject = new BehaviorSubject<boolean>(false);
   pumpState$ = this.pumpStateSubject.asObservable();
 
