@@ -7,7 +7,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const PORT = 5000;
-const SERIAL_PORT = '/dev/ttyUSB0';
+const SERIAL_PORT = '/dev/ttyACM0';
 const BLOCK_DURATION = 30 * 1000;
 const MAX_ATTEMPTS = 3;
 
@@ -34,9 +34,25 @@ try {
   let isBlocked = false;
   let blockEndTime = 0;
 
-  parser.on('data', async (codeSecret) => {
-    codeSecret = codeSecret.trim();
-    console.log('📩 Code reçu depuis Arduino:', codeSecret);
+  parser.on('data', async (data) => {
+    data = data.trim();
+    console.log('📩 Données reçues depuis Arduino:', data);
+  
+    try {
+      const jsonData = JSON.parse(data);
+  
+      if (jsonData.status === "Success" && jsonData.uid) {
+        console.log('🆔 UID de la carte:', jsonData.uid);
+        // Émettre uniquement l'UID vers le client
+        io.emit('card_uid', jsonData.uid);
+        return; // Ne pas émettre le message JSON complet
+      }
+  
+    } catch (error) {
+      console.error('❌ Erreur de parsing JSON:', error.message);
+    }
+    
+    // Fin de l'ajout de la récupération de l'UID
 
     if (isBlocked) {
       const remainingTime = Math.ceil((blockEndTime - Date.now()) / 1000);
@@ -45,14 +61,14 @@ try {
     }
 
     // Émettre le code reçu vers le client (une seule fois)
-    io.emit('code_secret', codeSecret);
+    io.emit('code_secret', data);
 
-    if (codeSecret.length === 4) {
+    if (data.length === 4) {
       try {
         const response = await fetch('http://localhost:8000/api/login-by-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code_secret: codeSecret })
+          body: JSON.stringify({ code_secret: data })
         });
 
         const result = await response.json();

@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px;
+  padding: 40px;
   background: #D0F0E5;
 }
 
@@ -173,4 +173,21 @@
   color: black;
   font-weight: bold;
   z-index: 1;
+}
+
+.error-message {
+  color: red;
+  font-size: 1.3em;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.additional-errors {
+  margin-top: 0px;
+}
+
+.error-detail {
+  color: red;
+  font-size: 1.3em;
+  margin: 5px 0;
 }

@@ -1,41 +1,45 @@
-/*design du tableau*/
-.table {
-    border-collapse: separate; /* Important pour border-radius */
-    border-spacing: 0; /* Évite les espaces entre les lignes */
-    border-radius: 10px; /* Arrondi les bords du tableau */
-    overflow: hidden; /* Coupe les bords extérieurs */
-  
-    
-    
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .table thead tr:first-child th {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+/* Design de la pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 10px 0;
+  gap: 5px; /* Espacement entre les boutons */
+}
 
-  }
-  
-/* pour designer la pagination */
+.pagination .page-item {
+  display: inline-block;
+  visibility: visible; /* Assure que tout est visible */
+  opacity: 1; /* Pas de disparition */
+}
+
 .pagination .page-link {
-  color: #28BC89; /* Couleur du texte des liens de pagination */
-  border-color: #28BC89; /* Couleur de la bordure des liens de pagination */
+  color: #28BC89; /* Couleur du texte */
+  border: 1px solid #28BC89; /* Bordure */
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+  text-align: center;
+  font-size: 16px; /* Rendre le texte bien visible */
+  font-weight: bold; /* Texte plus lisible */
 }
 
 .pagination .page-item.active .page-link {
-  background-color: #28BC89; /* Couleur de fond pour la page active */
-  color: #ffff;
-  border-color: #28BC89; /* Couleur de la bordure pour la page active */
+  background-color: #28BC89;
+  color: white; /* Texte blanc pour plus de visibilité */
+  border-color: #28BC89;
 }
 
 .pagination .page-item.disabled .page-link {
-  color: #ccc; /* Couleur grise pour les pages désactivées */
-  border-color: #ccc; /* Bordure grise pour les pages désactivées */
+  color: #ccc;
+  background-color: #f8f9fa;
+  border-color: #ccc;
+  cursor: not-allowed;
 }
 
-.pagination .page-item:hover .page-link {
-  background-color: #28BC89; /* Fond vert lors du survol */
-  border-color: #28BC89; /* Bordure verte lors du survol */
+.pagination .page-item:not(.disabled):hover .page-link {
+  background-color: #28BC89;
+  border-color: #28BC89;
   color: #ffffff;
 }

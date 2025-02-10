@@ -6,6 +6,12 @@ use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\HistoriqueController;
 
 
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,11 +27,12 @@ use App\Http\Controllers\HistoriqueController;
 
 // routes/api.php
 
-
 Route::post('/login-by-code', [UtilisateurController::class, 'loginByCode']); //connexion
 Route::post('/logout', [UtilisateurController::class, 'logout']); //déconnexion
-// Route pour récupérer tous les enregistrements d'historique
-Route::get('/historiques', [HistoriqueController::class, 'index']);
+Route::post('/login-by-card', [UtilisateurController::class, 'loginByCard']);
+
+
+// routes/api.php
 
 //use App\Http\Controllers\HistoriqueController;
 
@@ -45,10 +52,9 @@ Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController
 
 Route::post('/utilisateurs/block-multiple', [UtilisateurController::class, 'blockMultiple']);
 Route::post('/utilisateurs/switch-role/{id}', [UtilisateurController::class, 'switchRole']);
+
 Route::post('/utilisateurs/import-csv', [UtilisateurController::class, 'importCsv']);
 
 
 
 Route::post('/utilisateurs/assigner-carte/{id}', [UtilisateurController::class, 'assigner_carte']);
-
-

@@ -2,9 +2,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class CodeSecretNotification extends Notification implements ShouldQueue
 {
@@ -21,9 +21,10 @@ class CodeSecretNotification extends Notification implements ShouldQueue
         $this->nom = $nom;
     }
 
+    // ✅ Cette méthode doit être bien définie
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail']; // Envoie uniquement par mail
     }
 
     public function toMail($notifiable)
@@ -31,10 +32,12 @@ class CodeSecretNotification extends Notification implements ShouldQueue
         $frontendUrl = config('app.frontend_url');
 
         return (new MailMessage)
-                    ->subject('Votre code secret')
-                    ->line('Bonjour ' . $this->nom . ' ' . $this->prenom . ',')
-                    ->line('Votre code secret pour vous connecter est : ' . $this->code_secret)
-                    ->action('Se connecter', $frontendUrl);
+            ->subject('Votre code secret')
+            ->greeting('Bonjour ' . $this->nom . ' ' . $this->prenom . ',')
+            ->line('Votre code secret pour vous connecter est : **' . $this->code_secret . '**')
+            ->action('Se connecter', $frontendUrl)
+            ->line('Merci de votre confiance !')
+            ->salutation('Cordialement, L\'équipe SUNU_ARROSAGE');
     }
 
     public function toArray($notifiable)

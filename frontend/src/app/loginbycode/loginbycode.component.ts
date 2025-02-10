@@ -19,6 +19,8 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
   
     codeDigits: string[] = ['', '', '', ''];
     maskedDigits: string[] = ['', '', '', ''];
+   
+    additionalErrors: string[] = []; // Tableau pour stocker les erreurs supplémentaires
   
     errorMessage: string = '';
     shakeInputs: boolean = false;
@@ -50,10 +52,21 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
       this.socket.on('code_secret', (code: string) => this.handleKeypadInput(code));
     }
   
+      // Dans loginbycode.component.ts
     ngAfterViewInit() {
       this.focusFirstInput();
+      this.socket.on('card_uid', (uid: string) => {
+        this.utilisateurService.loginByCard(uid).subscribe(
+          (response) => this.handleLoginSuccess(response),
+          (error) => {
+            console.error('Erreur de connexion par carte:', error);
+            this.handleLoginFailure();
+          }
+        );
+      });
+      
     }
-  
+
     onCodeInput(event: Event, index: number) {
       const input = event.target as HTMLInputElement;
       let value = input.value;
@@ -112,38 +125,42 @@ import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@
         }
       }
     }
-    handleKeypadInput(key: string) {
-      if (this.isBlocked) return;
-      
-      const currentIndex = this.codeDigits.findIndex(digit => digit === '');
-      
-      if (currentIndex !== -1 && currentIndex < 4) {
-        // Mise à jour des états
-        this.codeDigits[currentIndex] = key;
-        this.maskedDigits[currentIndex] = key;
-        
-        const currentInput = this.codeInputs.toArray()[currentIndex];
-        if (currentInput) {
-          // Afficher la valeur puis la masquer
-          currentInput.nativeElement.value = key;
-          
-          setTimeout(() => {
-            currentInput.nativeElement.value = '•';
-            
-            // Passer à l'input suivant si ce n'est pas le dernier
-            if (currentIndex < 3) {
-              const nextInput = this.codeInputs.toArray()[currentIndex + 1];
-              if (nextInput) {
-                nextInput.nativeElement.focus();
-              }
-            } else {
-              // Si c'est le dernier chiffre, vérifier le code
-              this.verifyCode();
-            }
-          }, 500);
+
+   // Dans loginbycode.component.ts
+handleKeypadInput(key: string) {
+  if (this.isBlocked) return;
+
+  const currentIndex = this.codeDigits.findIndex(digit => digit === '');
+
+  if (currentIndex !== -1 && currentIndex < 4) {
+    // Mise à jour des états
+    this.codeDigits[currentIndex] = key;
+    this.maskedDigits[currentIndex] = key;
+
+    const currentInput = this.codeInputs.toArray()[currentIndex];
+    if (currentInput) {
+      // Afficher la valeur puis la masquer
+      currentInput.nativeElement.value = key;
+
+      setTimeout(() => {
+        currentInput.nativeElement.value = '•';
+
+        // Passer à l'input suivant si ce n'est pas le dernier
+        if (currentIndex < 3) {
+          const nextInput = this.codeInputs.toArray()[currentIndex + 1];
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+          }
+        } else {
+          // Si c'est le dernier chiffre, vérifier le code
+          this.verifyCode();
         }
-      }
+      }, 500);
     }
+  }
+}
+
+
 updateInputFocus(index: number) {
   // Move focus to the next input field if not the last one
   if (index < 3) {
@@ -153,30 +170,38 @@ updateInputFocus(index: number) {
 }
   
   
-    verifyCode() {
-      if (this.isBlocked) return;
   
-      const code = this.codeDigits.join('');
-      if (code.length < 4) return;
+verifyCode() {
+  if (this.isBlocked) return;
+
+  const code = this.codeDigits.join('');
+  if (code.length < 4) return;
+
+  this.utilisateurService.loginByCode(code).subscribe(
+    (response) => this.handleLoginSuccess(response),
+    () => this.handleLoginFailure()
+  );
+}
+
   
-      this.utilisateurService.loginByCode(code).subscribe(
-        (response) => this.handleLoginSuccess(response),
-        () => this.handleLoginFailure()
-      );
-    }
-  
-    handleLoginSuccess(response: any) {
-      console.log('✅ Connexion réussie:', response);
-      this.isLoggedIn = true;
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('prenom', response.user.prenom);
-      localStorage.setItem('nom', response.user.nom);
-      localStorage.setItem('role', response.user.role);
-  
-      if (response.user.role === 'super_admin' || response.user.role === 'admin_simple') {
-        this.router.navigate(['/dashbord']);
-      }
-    }
+handleLoginSuccess(response: any) {
+  console.log('✅ Connexion réussie:', response);
+  if (response.user && response.user.id) {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('prenom', response.user.prenom);
+    localStorage.setItem('nom', response.user.nom);
+    localStorage.setItem('role', response.user.role);
+    localStorage.setItem('userId', response.user.id); // Stocker l'ID de l'utilisateur
+    console.log('ID de l\'utilisateur stocké:', response.user.id);
+  } else {
+    console.error('ID de l\'utilisateur manquant dans la réponse:', response);
+  }
+
+  if (response.user.role === 'super_admin' || response.user.role === 'admin_simple') {
+    this.router.navigate(['/dashbord']);
+  }
+}
+    
   
     handleLoginBlocked(data: any) {
       this.isBlocked = true;
@@ -192,23 +217,31 @@ updateInputFocus(index: number) {
       }, 1000);
     }
   
-    handleLoginFailure() {
-      this.currentAttempts++;
-      this.errorMessage = `Code incorrect. Tentatives restantes : ${this.maxAttempts - this.currentAttempts}`;
-      this.shakeInputs = true;
-      this.inputError = true;
-  
-      if (this.currentAttempts >= this.maxAttempts) {
-        this.blockUser();
-      } else {
-        setTimeout(() => {
-          this.resetInputs();
-          this.shakeInputs = false;
-          this.inputError = false;
-        }, 1500);
-      }
+
+   // Exemple de gestion des erreurs
+  handleLoginFailure() {
+    this.currentAttempts++;
+    this.errorMessage = `Code incorrect. Tentatives restantes : ${this.maxAttempts - this.currentAttempts}`;
+    this.shakeInputs = true;
+    this.inputError = true;
+
+    // Ajouter des erreurs supplémentaires
+    this.additionalErrors = [
+      'Assurez-vous que votre carte ou code est valide.'
+    ];
+
+    if (this.currentAttempts >= this.maxAttempts) {
+      this.blockUser();
+    } else {
+      setTimeout(() => {
+        this.resetInputs();
+        this.shakeInputs = false;
+        this.inputError = false;
+        this.additionalErrors = []; // Réinitialiser les erreurs supplémentaires
+      }, 1500);
     }
-  
+  }
+
     blockUser() {
       this.isBlocked = true;
       const blockEndTime = new Date().getTime() + this.blockDuration * 1000;
@@ -248,12 +281,14 @@ updateInputFocus(index: number) {
       }, 0);
     }
   
-    resetInputs() {
-      this.codeDigits = ['', '', '', ''];
-      this.maskedDigits = ['', '', '', ''];
-      this.focusFirstInput();
-      this.inputError = false;
-    }
+   // Réinitialiser les erreurs supplémentaires
+  resetInputs() {
+    this.codeDigits = ['', '', '', ''];
+    this.maskedDigits = ['', '', '', ''];
+    this.focusFirstInput();
+    this.inputError = false;
+    this.additionalErrors = [];
+  }
   
     resetAttempts() {
       this.currentAttempts = 0;
