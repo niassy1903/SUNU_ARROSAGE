@@ -12,6 +12,22 @@ export class UtilisateurService {
 
   constructor(private http: HttpClient) { }
 
+  // Récupérer tous les historiques
+getHistoriques(): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques`);
+}
+
+// Récupérer les historiques d'un utilisateur spécifique
+getHistoriquesByUser(userId: string): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques/${userId}`);
+}
+
+// Filtrer les historiques par date
+filterHistoriquesByDate(date: string): Observable<any> {
+  return this.http.get(`http://localhost:8000/api/historiques/filter?date=${date}`);
+}
+
+
   // Créer un utilisateur
   createUtilisateur(utilisateur: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, utilisateur);
@@ -37,53 +53,74 @@ export class UtilisateurService {
     return this.http.delete(`${this.apiUrl}`, { body: { ids } });
   }
 
-  // Mettre à jour un utilisateur
-  updateUtilisateur(id: string, utilisateur: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, utilisateur);
-  }
 
+ // Mettre à jour un utilisateur
+ updateUtilisateur(id: string, utilisateur: any): Observable<any> {
+  return this.http.put(`${this.apiUrl}/${id}`, utilisateur);
+}
 
-  // Récupérer les enregistrements d'historique
-  getHistorique(): Observable<any> {
-    return this.http.get(`${this.apiUrl1}/historiques`);
-  }
-
-
-  
-   // Connexion par code secret
-   loginByCode(codeSecret: string): Observable<{ token: string, user: { prenom: string, nom: string, role: string } }> {
-    return this.http.post<{ token: string, user: { prenom: string, nom: string, role: string } }>(
-      `${this.apiUrl1}/login-by-code`, 
-      { code_secret: codeSecret }
-    ).pipe(
-      map(response => {
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('prenom', response.user.prenom);
-          localStorage.setItem('nom', response.user.nom);
-          localStorage.setItem('role', response.user.role);
-        }
-        return response;
-      })
-    );
-  }
-  
-
-// Déconnexion
-logout(): Observable<any> {
-  const token = localStorage.getItem('token');
-  return this.http.post(`${this.apiUrl1}/logout`, {}, {
-    headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` })
-  }).pipe(
-    tap(() => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      localStorage.removeItem('prenom'); // Suppression du prénom
-      localStorage.removeItem('nom'); // Suppression du nom
+ // Connexion par code secret
+ loginByCode(codeSecret: string): Observable<{ token: string, user: { prenom: string, nom: string, role: string } }> {
+  return this.http.post<{ token: string, user: { nom: string, prenom: string, role: string } }>(
+    `${this.apiUrl1}/login-by-code`, 
+    { code_secret: codeSecret }
+  ).pipe(
+    map(response => {
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('prenom', response.user.prenom);
+        localStorage.setItem('nom', response.user.nom);
+        localStorage.setItem('role', response.user.role);
+      }
+      return response;
     })
   );
 }
 
 
+// Déconnexion
+logout(): Observable<any> {
+const token = localStorage.getItem('token');
+return this.http.post(`${this.apiUrl1}/logout`, {}, {
+  headers: new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  })
+}).pipe(
+  tap(() => {
+    // Suppression des informations dans le localStorage après déconnexion réussie
+    localStorage.removeItem('token');
+    localStorage.removeItem('prenom');
+    localStorage.removeItem('nom');
+    localStorage.removeItem('role');
+  })
+);
+}
+
+// Bloquer plusieurs utilisateurs
+blockMultipleUtilisateurs(ids: string[]): Observable<any> {
+  return this.http.post(`${this.apiUrl}/block-multiple`, { ids });
+}
+
+// Changer le rôle d'un utilisateur
+switchRole(id: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/switch-role/${id}`, {});
+}
+
+
+// Importer des utilisateurs via CSV
+importCsv(formData: FormData): Observable<any> {
+  return this.http.post(`${this.apiUrl}/import-csv`, formData);
+}// Assigner une carte à un utilisateur
+
+assignCard(id: string, carteRfid: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/assigner-carte/${id}`, { carte_rfid: carteRfid });
+}
+
+
+
 
 }
+
+
+
+

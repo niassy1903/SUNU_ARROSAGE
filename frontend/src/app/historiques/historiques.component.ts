@@ -3,44 +3,87 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { UtilisateurService } from '../utilisateur.service';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-historiques',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, SidebarComponent],
+  imports: [CommonModule, NavbarComponent, SidebarComponent, FormsModule, HttpClientModule],
   templateUrl: './historiques.component.html',
-  styleUrls: ['./historiques.component.css']
+  styleUrl: './historiques.component.css',
+  providers: [UtilisateurService],
 })
 export class HistoriquesComponent implements OnInit {
-  historiques: any[] = [];
+  historiques: any[] = [];  // Assurer que c'est bien un tableau vide au départ
   page: number = 1;
   itemsPerPage: number = 5;
+  selectedUserId: string = ''; // Pour filtrer par utilisateur
+  selectedDate: string = ''; // Pour filtrer par date
 
-  constructor(private utilisateurService: UtilisateurService) { }
+  constructor(private utilisateurService: UtilisateurService) {}
 
   ngOnInit(): void {
-    this.loadHistorique();
+    this.loadHistoriques();
   }
 
-  loadHistorique(): void {
-    this.utilisateurService.getHistorique().subscribe(
-      data => {
-        this.historiques = data.historiques;
+  loadHistoriques(): void {
+    this.utilisateurService.getHistoriques().subscribe({
+      next: (data) => {
+        if (data && Array.isArray(data.historiques)) {
+          this.historiques = data.historiques;  // Accéder à la clé `historiques`
+        } else {
+          console.error("Les données reçues ne sont pas un tableau :", data);
+          this.historiques = [];
+        }
       },
-      error => {
-        console.error('Erreur lors de la récupération de l\'historique', error);
+      error: (error) => {
+        console.error("Erreur lors du chargement des historiques :", error);
       }
-    );
+    });
+  }
+  
+
+  // Charger les historiques d'un utilisateur spécifique
+  loadHistoriquesByUser(): void {
+    if (this.selectedUserId) {
+      this.utilisateurService.getHistoriquesByUser(this.selectedUserId).subscribe({
+        next: (data) => {
+          this.historiques = Array.isArray(data) ? data : [];
+        },
+        error: (error) => {
+          console.error("Erreur lors du chargement des historiques de l'utilisateur :", error);
+        }
+      });
+    }
+  }
+
+  // Charger les historiques filtrés par date
+  filterHistoriquesByDate(): void {
+    if (this.selectedDate) {
+      this.utilisateurService.filterHistoriquesByDate(this.selectedDate).subscribe({
+        next: (data) => {
+          this.historiques = Array.isArray(data) ? data : [];
+        },
+        error: (error) => {
+          console.error("Erreur lors du filtrage des historiques par date :", error);
+        }
+      });
+    }
   }
 
   get paginatedHistorique() {
+    if (!Array.isArray(this.historiques)) {
+      console.error("Erreur : historiques n'est pas un tableau", this.historiques);
+      return [];
+    }
     const start = (this.page - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     return this.historiques.slice(start, end);
   }
 
   totalPages(): number {
-    return Math.ceil(this.historiques.length / this.itemsPerPage);
+    return this.historiques.length > 0 ? Math.ceil(this.historiques.length / this.itemsPerPage) : 1;
   }
 
   changePage(newPage: number) {

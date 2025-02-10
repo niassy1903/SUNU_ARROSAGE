@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Notifications\Notifiable;
 use MongoDB\Laravel\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Utilisateur extends Model implements JWTSubject
 {
+    use Notifiable;
+
     protected $connection = 'mongodb';
     protected $collection = 'utilisateurs';
 
@@ -19,17 +22,38 @@ class Utilisateur extends Model implements JWTSubject
         'role',
         'telephone',
         'adresse',
+        'email', // Ajoutez l'email ici
     ];
 
-    // Méthode pour obtenir l'identifiant JWT
-    public function getJWTIdentifier()
+    /**
+     * Route notifications for the mail channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForMail($notification)
     {
-        return $this->getKey();
-    }
-
-    // Méthode pour obtenir les claims personnalisés JWT
-    public function getJWTCustomClaims()
-    {
-        return [];
+        // Retourne l'adresse email de l'utilisateur pour l'envoi de notifications
+            return $this->email;
+        }
+    
+        /**
+         * Get the identifier that will be stored in the subject claim of the JWT.
+         *
+         * @return mixed
+         */
+        public function getJWTIdentifier()
+        {
+            return $this->getKey();
+        }
+    
+        /**
+         * Return a key value array, containing any custom claims to be added to the JWT.
+         *
+         * @return array
+         */
+        public function getJWTCustomClaims()
+        {
+            return [];
     }
 }

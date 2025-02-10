@@ -9,6 +9,21 @@
       <app-navbar></app-navbar>
 
       <main role="main" class="main-content">
+        <!-- Section de filtre -->
+        <div class="filter-container mb-3 d-flex align-items-center">
+          <div class="form-group me-2">
+            <label for="userId" class="form-label">Filtrer par utilisateur :</label>
+            <input type="text" id="userId" [(ngModel)]="selectedUserId" class="form-control" placeholder="ID utilisateur">
+          </div>
+          <button class="btn btn-primary me-3" (click)="loadHistoriquesByUser()">Rechercher</button>
+
+          <div class="form-group me-2">
+            <label for="date" class="form-label">Filtrer par date :</label>
+            <input type="date" id="date" [(ngModel)]="selectedDate" class="form-control">
+          </div>
+          <button class="btn btn-primary" (click)="filterHistoriquesByDate()">Rechercher</button>
+        </div>
+
         <div class="table-container">
           <table class="table">
             <thead class="thead-light">
@@ -23,15 +38,24 @@
             </thead>
             <tbody>
               <tr *ngFor="let historique of paginatedHistorique">
-                <td><img src="profil.png" alt="{{ historique.nom }} {{ historique.prenom }}" class="rounded-circle" width="30"></td>
-                <td>{{ historique.prenom }}</td>
-                <td>{{ historique.nom }}</td>
+                <td>
+                  <img
+                    [src]="historique.utilisateur.photo ? historique.utilisateur.photo : '/public/profil.png'"
+                    alt="Photo de l'utilisateur"
+                    width="50"
+                    height="50"
+                    class="rounded-circle"
+                  />
+                </td>
+                <td>{{ historique.utilisateur.prenom }}</td>
+                <td>{{ historique.utilisateur.nom }}</td>
                 <td>{{ historique.action }}</td>
-                <td>{{ historique.date_heure | date: 'yyyy-MM-dd' }}</td>
-                <td>{{ historique.date_heure | date: 'HH:mm:ss' }}</td>
+                <td>{{ historique.heure.slice(0, 5) }}</td>
+                <td>{{ historique.date.split('-').reverse().join('/') }}</td>
               </tr>
             </tbody>
           </table>
+          
         </div>
 
         <!-- Pagination avec Bootstrap -->

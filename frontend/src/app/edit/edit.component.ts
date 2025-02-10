@@ -1,5 +1,3 @@
-// src/app/edit/edit.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilisateurService } from '../utilisateur.service';
@@ -15,6 +13,7 @@ interface User {
   _id: string;
   nom: string;
   prenom: string;
+  email: string;
   role: string;
   telephone: string;
   adresse: string;
@@ -31,12 +30,12 @@ interface User {
   imports: [FormsModule, CommonModule, HttpClientModule, SidebarComponent, NavbarComponent],
   providers: [UtilisateurService],
 })
-
 export class EditComponent implements OnInit {
   user: User = {
     _id: '',
     nom: '',
     prenom: '',
+    email: '',
     role: '',
     telephone: '',
     adresse: '',
@@ -74,7 +73,7 @@ export class EditComponent implements OnInit {
       (response) => {
         console.log('Utilisateur mis à jour avec succès', response);
         $('#updateConfirmationModal').modal('hide');
-        this.router.navigate(['/utilisateurs']);
+        this.router.navigate(['/utilisateur']);
       },
       (error) => {
         console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
