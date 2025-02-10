@@ -15,9 +15,18 @@
             <div class="stat-box">
              
               <p class="date-time"> {{ '' | currentTime }}</p>
-              <p class="stat-title">État pompe</p>
+             
               <div class="status">
-                <img id="allume" src="les-controles.png" class="stat-icon" alt="Humidité">
+               
+                <div class="pompe-control">
+                  <label class="switch">
+                    <input type="checkbox" [(ngModel)]="isPompeOn" (change)="togglePompe()">
+                    <span class="slider"></span>
+                  </label>
+                  <p id="etatPompe" [ngStyle]="{'color': isPompeOn ? 'green' : 'red'}">
+                    {{ isPompeOn ? 'Pompe allumée' : 'Pompe éteinte' }}
+                  </p>
+                </div>
               </div>
             </div>
 
