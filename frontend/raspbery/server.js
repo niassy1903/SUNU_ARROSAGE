@@ -15,10 +15,10 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const raspberryPiConfig = {
-  host: '192.168.1.7',
+  host: '192.168.1.26',
   port: 22,
-  username: 'khalifa',
-  password: 'khalifa87'
+  username: 'antamaguette',
+  password: 'antamaguette'
 };
 
 app.use(bodyParser.json());
@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
   conn.on('ready', () => {
     console.log("Connexion SSH établie avec le Raspberry Pi !");
 
-    const command = 'python3 /home/khalifa/read_sensors.py';
+    const command = 'python3 /home/antamaguette/ardi.py';
 
     conn.exec(command, (err, stream) => {
       if (err) {
@@ -243,7 +243,7 @@ app.post('/api/pump/control', async (req, res) => {
     conn.on('ready', () => {
       console.log("✅ Connexion SSH établie avec le Raspberry Pi !");
 
-      const command = `python3 /home/khalifa/pump_control.py ${state}`;
+      const command = `python3 /home/antamaguette/pump.py ${state}`;
 
       conn.exec(command, async (err, stream) => {
         if (err) {
@@ -320,7 +320,7 @@ app.get('/api/sensor-data', (req, res) => {
   conn.on('ready', () => {
     console.log("Connexion SSH établie avec le Raspberry Pi !");
 
-    const command = 'python3 /home/khalifa/ardi.py';
+    const command = 'python3 /home/antamaguette/ardi.py';
 
     conn.exec(command, (err, stream) => {
       if (err) {
@@ -343,6 +343,71 @@ app.get('/api/sensor-data', (req, res) => {
     res.status(500).json({ error: "Impossible de se connecter au Raspberry Pi." });
   }).connect(raspberryPiConfig);
 });
+
+
+
+//automatique
+
+// Fonction de vérification des horaires et déclenchement de la pompe
+// Fonction de vérification des horaires et déclenchement de la pompe
+const checkWateringSchedules = () => {
+  // Lancer la vérification des horaires planifiés toutes les 60 secondes
+  setInterval(async () => {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();  // Temps actuel en minutes
+
+    // Récupérer les horaires planifiés
+    const schedules = await Schedule.find();
+
+    schedules.forEach(schedule => {
+      const [startHours, startMinutes] = schedule.startTime.split(':');
+      const startTimeInMinutes = parseInt(startHours) * 60 + parseInt(startMinutes);
+
+      // Si l'heure actuelle correspond à l'heure planifiée, activer la pompe
+      if (currentTime === startTimeInMinutes) {
+        activatePump();
+      }
+    });
+  }, 60000);  // Vérifier toutes les minutes
+};
+
+// Fonction pour activer la pompe
+const activatePump = async () => {
+  try {
+    // Créer une connexion SSH avec le Raspberry Pi
+    const conn = new Client();
+    
+    conn.on('ready', () => {
+      console.log("Connexion SSH établie avec le Raspberry Pi !");
+      
+      // Commande pour activer la pompe (changer 'on' pour 'off' selon l'état)
+      const command = 'python3 /home/antamaguette/pump.py on';  // Remplacer 'on' par 'off' si nécessaire
+      
+      conn.exec(command, (err, stream) => {
+        if (err) {
+          console.error("Erreur lors de l'exécution de la commande : ", err);
+          conn.end();
+          return;
+        }
+        
+        stream.on('data', (data) => {
+          console.log(`Sortie de la commande : ${data.toString()}`);
+        });
+        
+        stream.on('close', () => {
+          console.log("Commande exécutée avec succès !");
+          conn.end();
+        });
+      });
+    }).on('error', (err) => {
+      console.error("Erreur de connexion SSH :", err);
+    }).connect(raspberryPiConfig);
+  } catch (err) {
+    console.error("Erreur lors de l'activation de la pompe :", err);
+  }
+};
+// Lancer la vérification des horaires planifiés
+checkWateringSchedules();
 
 // Port sur lequel démarre le serveur
 const PORT = process.env.PORT || 5000;
