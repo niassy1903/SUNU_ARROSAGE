@@ -348,7 +348,7 @@ app.get('/api/sensor-data', (req, res) => {
 
 //automatique
 
-// Fonction de vérification des horaires et déclenchement de la pompe
+
 // Fonction de vérification des horaires et déclenchement de la pompe
 const checkWateringSchedules = () => {
   // Lancer la vérification des horaires planifiés toutes les 60 secondes
@@ -372,6 +372,7 @@ const checkWateringSchedules = () => {
 };
 
 // Fonction pour activer la pompe
+
 const activatePump = async () => {
   try {
     // Créer une connexion SSH avec le Raspberry Pi

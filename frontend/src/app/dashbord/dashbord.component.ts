@@ -57,10 +57,7 @@ export class DashbordComponent implements OnInit {
     this.loadChartData();
     this.loadSchedules();
    
-    this.PompeService.pumpState$.subscribe(
-      state => this.isPompeOn = state
-    );
-    
+   
    
   }
 
@@ -283,6 +280,26 @@ togglePompe() {
       this.isPompeOn = !newState; // Revenir à l'état précédent en cas d'erreur
     }
   });
+}
+
+//envoyer les donnerr en alument la pompe
+envoyerDonnees() {
+  const irrigationData = {
+    humiditer: '5',
+    luminositer: '2%',
+    volume_arroser: 12,
+    type_arrosage: 'manuelle',
+    pumpState: this.isPompeOn // Ajout de l'état de la pompe
+  };
+
+  this.irrigationService.envoyerIrrigation(irrigationData).subscribe(
+    response => {
+      console.log('Irrigation envoyée avec succès', response);
+    },
+    error => {
+      console.error('Erreur lors de l’envoi des données', error);
+    }
+  );
 }
 
 }

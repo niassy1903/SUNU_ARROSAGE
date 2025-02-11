@@ -20,7 +20,7 @@
                
                 <div class="pompe-control">
                   <label class="switch">
-                    <input type="checkbox" [(ngModel)]="isPompeOn" (change)="togglePompe()">
+                    <input type="checkbox" [(ngModel)]="isPompeOn" (change)="togglePompe(); envoyerDonnees()">
                     <span class="slider"></span>
                   </label>
                   <p id="etatPompe" [ngStyle]="{'color': isPompeOn ? 'green' : 'red'}">
