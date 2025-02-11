@@ -38,6 +38,21 @@
     font-size: 0.8em;
     color: #6c757d;
   }
+
+  .h2 {
+    display: flex;
+    justify-content: center; /* Centre le texte horizontalement */
+    align-items: center; /* Aligne verticalement si besoin */
+    color: #28bc89; /* Applique la couleur */
+    font-size: 2rem; /* Ajuste la taille du texte */
+    font-weight: bold; /* Rend le texte plus visible */
+}
+
+.word {
+    margin: 0 5px; /* Ajoute un espace entre les mots */
+}
+
+
   
   .dropdown-menu {
     position: absolute;

@@ -23,6 +23,7 @@ class Utilisateur extends Model implements JWTSubject
         'telephone',
         'adresse',
         'email', // Ajoutez l'email ici
+        'status',
     ];
 
     /**

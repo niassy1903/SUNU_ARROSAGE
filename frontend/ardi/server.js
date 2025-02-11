@@ -9,13 +9,15 @@ const PORT = 3000;
 app.use(bodyParser.json());
 app.use(cors());
 
-// Configuration SSH
+// Configuration SSH pour se connecter au Raspberry Pi
 const sshConfig = {
-  host: '192.168.1.26',
-  port: 22,
-  username: 'antamaguette',
-  password: 'antamaguette'
-};
+    host: '192.168.1.26',
+    port: 22,
+    username: 'antamaguette',
+    password: 'antamaguette',
+    readyTimeout: 0 // Désactive le timeout de connexion
+  };
+  
 
 // Commande à exécuter sur le Raspberry Pi
 const command = 'python3 /home/antamaguette/ardi.py';

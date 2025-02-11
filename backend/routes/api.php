@@ -6,7 +6,6 @@ use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\HistoriqueController;
 
 
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -34,7 +33,6 @@ Route::post('/login-by-card', [UtilisateurController::class, 'loginByCard']);
 
 // routes/api.php
 
-//use App\Http\Controllers\HistoriqueController;
 
 Route::get('/historiques', [HistoriqueController::class, 'index']);
 Route::get('/historiques/{userId}', [HistoriqueController::class, 'show']);
@@ -49,12 +47,8 @@ Route::delete('/utilisateurs', [UtilisateurController::class, 'deleteMultiple'])
 Route::put('/utilisateurs/{id}', [UtilisateurController::class, 'update']);
 Route::get('/utilisateurs/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
 Route::get('/utilisateurs/check-carte-rfid/{carte_rfid}', [UtilisateurController::class, 'checkCarteRfidExists']);
-
 Route::post('/utilisateurs/block-multiple', [UtilisateurController::class, 'blockMultiple']);
 Route::post('/utilisateurs/switch-role/{id}', [UtilisateurController::class, 'switchRole']);
-
 Route::post('/utilisateurs/import-csv', [UtilisateurController::class, 'importCsv']);
-
-
-
+Route::post('/utilisateurs/unblock-multiple', [UtilisateurController::class, 'unblockMultiple']);
 Route::post('/utilisateurs/assigner-carte/{id}', [UtilisateurController::class, 'assigner_carte']);

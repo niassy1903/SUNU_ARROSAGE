@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class PlaningService {
 
-  private apiUrl = 'http://localhost:5000/api/schedule'; // URL de votre backend
+  private apiUrl = 'http://localhost:5001/api/schedule'; // URL de votre backend
 
   constructor(private http: HttpClient) {}
 

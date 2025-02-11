@@ -15,7 +15,7 @@ export interface IrrigationData {
 })
 
 export class IrrigationService {
-  private apiUrl = 'http://localhost:5000/api/irrigation';
+  private apiUrl = 'http://localhost:5001/api/irrigation';
 
   constructor(private http: HttpClient) {}
 
@@ -65,4 +65,9 @@ export class IrrigationService {
   deleteSchedule(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  envoyerIrrigation(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
+  }
+
 }

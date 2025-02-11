@@ -12,7 +12,7 @@ import { io, Socket } from 'socket.io-client';
 declare var $: any;
 
 interface User {
-  status: any;
+  status: string;
   id: string;
   nom: string;
   prenom: string;
@@ -110,7 +110,6 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     $('#deleteConfirmationModal').modal('show');
   }
 
-  // Supprimer un utilisateur
   deleteUser(): void {
     if (this.userToDelete) {
       this.utilisateurService.deleteUtilisateur(this.userToDelete.id).subscribe(
@@ -126,8 +125,15 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Editer un utilisateur
   editUser(user: User): void {
+    if (user.status === 'inactif') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Impossible d\'éditer un utilisateur bloqué.',
+      });
+      return;
+    }
     if (user && user.id) {
       this.router.navigate(['/edit', user.id]);
     } else {
@@ -150,7 +156,6 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     $('#assignCardModal').modal('show');
   }
 
-  // Affecter une carte RFID à l'utilisateur sélectionné
   assignCard() {
     if (this.selectedUser && this.carte_rfid_modal) {
       this.utilisateurService.assignCard(this.selectedUser.id, this.carte_rfid_modal).subscribe(
@@ -191,7 +196,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-//confirmer la suppression de plusieurs utilisateurs
+
   confirmDeleteMultiple(): void {
     if (this.selectedUsers.length > 0) {
       Swal.fire({
@@ -221,9 +226,19 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-//bloquer plusieurs utilisateurs
+
   blockMultiple(): void {
     if (this.selectedUsers.length > 0) {
+      const allUsersActive = this.selectedUsers.every(user => user.status === 'actif');
+      if (!allUsersActive) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Attention',
+          text: 'Certains utilisateurs sélectionnés sont déjà bloqués.',
+        });
+        return;
+      }
+
       Swal.fire({
         title: 'Êtes-vous sûr?',
         text: "Vous êtes sur le point de bloquer ces utilisateurs!",
@@ -252,25 +267,66 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectAll(): void {
-    if (this.selectedUsers.length === this.paginatedUsers.length) {
-      // Si tous les utilisateurs sont déjà sélectionnés, désélectionnez-les
-      this.selectedUsers = [];
-    } else {
-      // Sinon, sélectionnez tous les utilisateurs
-      this.selectedUsers = [...this.paginatedUsers];
-    }
-  }
-// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.ts:
-  openSwitchRoleModal(): void {
-    if (this.selectedUsers.length === 1) {
-      $('#switchRoleModal').modal('show');
-    } else {
-      alert('Veuillez sélectionner un seul utilisateur pour changer de rôle.');
+  unblockMultiple(): void {
+    if (this.selectedUsers.length > 0) {
+      const allUsersInactive = this.selectedUsers.every(user => user.status === 'inactif');
+      if (!allUsersInactive) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Attention',
+          text: 'Certains utilisateurs sélectionnés sont déjà actifs.',
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous êtes sur le point de débloquer ces utilisateurs!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Oui, débloquer!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.utilisateurService.unblockMultipleUtilisateurs(this.selectedUsers.map(user => user.id)).subscribe(
+            (response) => {
+              Swal.fire(
+                'Débloqué!',
+                'Utilisateurs débloqués avec succès.',
+                'success'
+              );
+              this.loadUsers();
+            },
+            (error) => {
+              console.error('Erreur lors du déblocage des utilisateurs', error);
+            }
+          );
+        }
+      });
     }
   }
 
-  // Changer le rôle de l'utilisateur sélectionné
+  selectAll(): void {
+    if (this.selectedUsers.length === this.paginatedUsers.length) {
+      this.selectedUsers = [];
+    } else {
+      this.selectedUsers = [...this.paginatedUsers];
+    }
+  }
+
+  openSwitchRoleModal(): void {
+    if (this.selectedUsers.length === 1 && this.selectedUsers[0].status === 'actif') {
+      $('#switchRoleModal').modal('show');
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Attention',
+        text: 'Veuillez sélectionner un seul utilisateur actif pour changer de rôle.',
+      });
+    }
+  }
+
   switchRole(): void {
     if (this.selectedUsers.length === 1) {
       this.utilisateurService.switchRole(this.selectedUsers[0].id).subscribe(
@@ -281,7 +337,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
             showConfirmButton: false,
             timer: 1500
           });
-          this.loadUsers(); // Rechargez les utilisateurs pour refléter le changement
+          this.loadUsers();
         },
         (error) => {
           console.error('Erreur lors de la mise à jour du rôle', error);
@@ -292,10 +348,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
           });
         }
       );
-
-    } 
-    
-    else {
+    } else {
       Swal.fire({
         icon: 'warning',
         title: 'Sélection requise',
@@ -303,18 +356,15 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.ts:
 
   openCsvImportModal(): void {
     $('#csvImportModal').modal('show');
   }
 
-  // Gérer la sélection d'un fichier CSV
   onFileSelected(event: any): void {
     this.csvFile = event.target.files[0];
   }
 
-  // Gérer la sélection d'un utilisateur
   toggleSelection(user: User): void {
     const index = this.selectedUsers.indexOf(user);
     if (index === -1) {
@@ -323,13 +373,11 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       this.selectedUsers.splice(index, 1);
     }
   }
-// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.html:*ngFor="let user of paginatedUsers"
-// Compare this snippet from frontend/src/app/utilisateur/utilisateur.component.html:
+
   isSelected(user: User): boolean {
     return this.selectedUsers.includes(user);
   }
 
-  // Importer un fichier CSV
   importCsv() {
     if (this.csvFile) {
       const formData = new FormData();
@@ -367,6 +415,4 @@ export class UtilisateurComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
-
 }
