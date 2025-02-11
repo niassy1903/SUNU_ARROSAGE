@@ -17,7 +17,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class HistoriquesComponent implements OnInit {
   historiques: any[] = [];  // Assurer que c'est bien un tableau vide au départ
   page: number = 1;
-  itemsPerPage: number = 5;
+  itemsPerPage: number = 7;
   selectedDate: string = ''; // Pour filtrer par date
 
   constructor(private utilisateurService: UtilisateurService) {}

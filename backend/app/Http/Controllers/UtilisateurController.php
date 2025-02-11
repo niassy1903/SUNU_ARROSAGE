@@ -11,7 +11,6 @@ use Carbon\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UtilisateurController extends Controller
-
 {
     // Fonction pour enregistrer une action dans l'historique
     private function logAction($userId, $nom, $prenom, $action)
@@ -26,7 +25,8 @@ class UtilisateurController extends Controller
             'heure' => $now->toTimeString(), // Enregistre l'heure
         ]);
     }
-        // Fonction pour créer un utilisateur
+
+    // Fonction pour créer un utilisateur
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -41,32 +41,36 @@ class UtilisateurController extends Controller
             'nom.required' => 'Le champ nom est obligatoire.',
             'nom.string' => 'Le nom doit être une chaîne de caractères.',
             'nom.max' => 'Le nom ne doit pas dépasser 255 caractères.',
-        
+
             'prenom.required' => 'Le champ prénom est obligatoire.',
             'prenom.string' => 'Le prénom doit être une chaîne de caractères.',
             'prenom.max' => 'Le prénom ne doit pas dépasser 255 caractères.',
-        
+
             'role.required' => 'Le champ rôle est obligatoire.',
             'role.in' => 'Le rôle doit être soit "admin_simple" soit "super_admin".',
-        
+
             'telephone.required' => 'Le champ téléphone est obligatoire.',
             'telephone.string' => 'Le téléphone doit être une chaîne de caractères.',
             'telephone.max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères.',
             'telephone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
-        
+
             'adresse.required' => 'Le champ adresse est obligatoire.',
             'adresse.string' => 'L\'adresse doit être une chaîne de caractères.',
             'adresse.max' => 'L\'adresse ne doit pas dépasser 255 caractères.',
-        
+
             'carte_rfid.string' => 'La carte RFID doit être une chaîne de caractères.',
             'carte_rfid.max' => 'La carte RFID ne doit pas dépasser 255 caractères.',
             'carte_rfid.unique' => 'Cette carte RFID est déjà utilisée.',
-        
+
             'email.required' => 'Le champ email est obligatoire.',
             'email.email' => 'L\'email doit être une adresse email valide.',
             'email.unique' => 'Cet email est déjà utilisé.',
+
+            'status.string' => 'le status est une chaine de caracteres',
+            
+
+            
         ]);
-        
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
@@ -85,6 +89,7 @@ class UtilisateurController extends Controller
             'telephone' => $request->telephone,
             'adresse' => $request->adresse,
             'email' => $request->email,
+            'status' => 'actif', // Définir l'utilisateur comme actif par défaut
         ]);
 
         // Envoyer la notification
@@ -95,15 +100,15 @@ class UtilisateurController extends Controller
 
         return response()->json(['message' => 'Utilisateur créé avec succès', 'utilisateur' => $utilisateur], 201);
     }
-// Fonction pour lister tous les utilisateurs
 
+    // Fonction pour lister tous les utilisateurs
     public function list()
     {
         $utilisateurs = Utilisateur::all();
         return response()->json(['utilisateurs' => $utilisateurs], 200);
     }
 
-// Fonction pour supprimer un utilisateur
+    // Fonction pour supprimer un utilisateur
     public function delete($id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -118,8 +123,7 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
 
-// Fonction pour supprimer plusieurs utilisateurs
-
+    // Fonction pour supprimer plusieurs utilisateurs
     public function deleteMultiple(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -144,13 +148,18 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateurs supprimés avec succès'], 200);
     }
 
-// Fonction pour mettre à jour un utilisateur
+    // Fonction pour mettre à jour un utilisateur
     public function update(Request $request, $id)
     {
         $utilisateur = Utilisateur::find($id);
         if (!$utilisateur) {
             return response()->json(['error' => 'Utilisateur non trouvé'], 404);
         }
+
+        if ($utilisateur->status === 'inactif') {
+            return response()->json(['error' => 'Impossible de mettre à jour un utilisateur bloqué'], 403);
+        }
+
         $rules = [
             'nom' => 'sometimes|string|max:255',
             'prenom' => 'sometimes|string|max:255',
@@ -188,7 +197,7 @@ class UtilisateurController extends Controller
         ], 200);
     }
 
-// Fonction pour obtenir un utilisateur par ID
+    // Fonction pour obtenir un utilisateur par ID
     public function getUtilisateur($id)
     {
         $utilisateur = Utilisateur::find($id);
@@ -198,7 +207,7 @@ class UtilisateurController extends Controller
         return response()->json(['utilisateur' => $utilisateur], 200);
     }
 
-// Vérifier si le numéro de téléphone existe déjà pour un autre utilisateur
+    // Vérifier si le numéro de téléphone existe déjà pour un autre utilisateur
     public function checkTelephoneExists($telephone)
     {
         $exists = Utilisateur::where('telephone', $telephone)->exists();
@@ -227,7 +236,6 @@ class UtilisateurController extends Controller
     }
 
     // Fonction pour bloquer plusieurs utilisateurs
-
     public function blockMultiple(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -252,13 +260,41 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateurs bloqués avec succès'], 200);
     }
 
-    // Fonction pour basculer entre 'admin_simple' et 'super_admin'
+    // Fonction pour débloquer plusieurs utilisateurs
+    public function unblockMultiple(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'exists:utilisateurs,_id',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $ids = $request->input('ids');
+        $utilisateurs = Utilisateur::whereIn('_id', $ids)->get();
+
+        foreach ($utilisateurs as $utilisateur) {
+            // Enregistrer l'action pour chaque utilisateur débloqué
+            $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Déblocage multiple d\'utilisateurs');
+        }
+
+        Utilisateur::whereIn('_id', $ids)->update(['status' => 'actif']);
+
+        return response()->json(['message' => 'Utilisateurs débloqués avec succès'], 200);
+    }
+
+    // Fonction pour basculer entre 'admin_simple' et 'super_admin'
     public function switchRole(Request $request, $id)
     {
         $utilisateur = Utilisateur::find($id);
         if (!$utilisateur) {
             return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        if ($utilisateur->status === 'inactif') {
+            return response()->json(['error' => 'Impossible de changer le rôle d\'un utilisateur bloqué'], 403);
         }
 
         // Basculer entre 'admin_simple' et 'super_admin'
@@ -271,8 +307,6 @@ class UtilisateurController extends Controller
 
         return response()->json(['message' => 'Rôle mis à jour avec succès', 'utilisateur' => $utilisateur], 200);
     }
-
-  
 
     // Fonction pour assigner une carte RFID à un utilisateur
     public function assigner_carte(Request $request, $id)
@@ -308,41 +342,42 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Carte RFID assignée avec succès', 'utilisateur' => $utilisateur], 200);
     }
 
-    // Fonction pour se connecter par code secret
-    public function loginByCode(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'code_secret' => 'required|numeric|digits:4',
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
-    
-        $code_secret = $request->input('code_secret');
-        $utilisateur = Utilisateur::where('code_secret', $code_secret)->first();
-    
-        if ($utilisateur) {
-            // Générer un token JWT pour l'utilisateur
-            $token = JWTAuth::fromUser($utilisateur);
-    
-            return response()->json([
-                'message' => 'Connexion réussie',
-                'token' => $token,
-                'user' => [
-                    'id' => $utilisateur->id, // Inclure l'ID de l'utilisateur
-                    'nom' => $utilisateur->nom,
-                    'prenom' => $utilisateur->prenom,
-                    'role' => $utilisateur->role
-                ]
-            ], 201);
-        } else {
-            return response()->json(['error' => 'Code incorrect'], 401);
-        }
-    }
-    
-    // Fonction pour se déconnecter
 
+// Fonction pour se connecter par code secret
+public function loginByCode(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'code_secret' => 'required|numeric|digits:4',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    $code_secret = $request->input('code_secret');
+    $utilisateur = Utilisateur::where('code_secret', $code_secret)->first();
+
+    if ($utilisateur && $utilisateur->status === 'actif') {
+        // Générer un token JWT pour l'utilisateur
+        $token = JWTAuth::fromUser($utilisateur);
+
+        return response()->json([
+            'message' => 'Connexion réussie',
+            'token' => $token,
+            'user' => [
+                'id' => $utilisateur->id, // Inclure l'ID de l'utilisateur
+                'nom' => $utilisateur->nom,
+                'prenom' => $utilisateur->prenom,
+                'role' => $utilisateur->role
+            ]
+        ], 201);
+    } else {
+        return response()->json(['error' => 'Code incorrect ou compte bloqué'], 401);
+    }
+}
+
+
+    // Fonction pour se déconnecter
     public function logout(Request $request)
     {
         $token = $request->bearerToken();
@@ -371,90 +406,82 @@ class UtilisateurController extends Controller
         }
     }
 
-
-//fonction pour se connecter avec la carte RFID
+    // Fonction pour se connecter avec la carte RFID
     public function loginByCard(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'carte_rfid' => 'required|string|max:255',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 400);
-    }
-
-    $carte_rfid = $request->input('carte_rfid');
-    $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
-
-    if ($utilisateur) {
-        if ($utilisateur->status === 'inactif') {
-            return response()->json(['error' => 'Compte bloqué'], 403);
-        }
-
-        // Générer un token JWT pour l'utilisateur
-        $token = JWTAuth::fromUser($utilisateur);
-
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'token' => $token,
-            'user' => [
-                'id' => $utilisateur->id,
-                'nom' => $utilisateur->nom,
-                'prenom' => $utilisateur->prenom,
-                'role' => $utilisateur->role
-            ]
-        ], 200);
-    } else {
-        return response()->json(['error' => 'Carte RFID non reconnue'], 401);
-    }
-}
-
-
-public function importCsv(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'csv_file' => 'required|mimes:csv,txt',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 400);
-    }
-
-    $file = $request->file('csv_file');
-    $csvData = array_map('str_getcsv', file($file));
-    $header = array_shift($csvData);
-
-    $expectedHeader = ['nom', 'prenom', 'role', 'telephone', 'adresse', 'email', 'carte_rfid'];
-    if ($header !== $expectedHeader) {
-        return response()->json(['error' => 'L\'ordre des champs dans le CSV est incorrect. Veuillez suivre cet ordre : ' . implode(', ', $expectedHeader)], 400);
-    }
-
-    foreach ($csvData as $row) {
-        // Vérifiez que chaque ligne a le même nombre de colonnes que l'en-tête
-        if (count($row) !== count($header)) {
-            return response()->json(['error' => 'Le fichier CSV contient des lignes avec un nombre incorrect de colonnes.'], 400);
-        }
-
-        $data = array_combine($header, $row);
-        $utilisateur = Utilisateur::create([
-            'nom' => $data['nom'],
-            'prenom' => $data['prenom'],
-            'role' => $data['role'],
-            'telephone' => $data['telephone'],
-            'adresse' => $data['adresse'],
-            'email' => $data['email'],
-            'carte_rfid' => $data['carte_rfid'] ?? null,
-            'matricule' => $this->generateMatricule($data['role']),
-            'code_secret' => $this->generateCodeSecret(),
+    {
+        $validator = Validator::make($request->all(), [
+            'carte_rfid' => 'required|string|max:255',
         ]);
 
-        // Enregistrer l'action après l'importation de chaque utilisateur
-        $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Importation d\'utilisateur');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $carte_rfid = $request->input('carte_rfid');
+        $utilisateur = Utilisateur::where('carte_rfid', $carte_rfid)->first();
+
+        if ($utilisateur && $utilisateur->status === 'actif') {
+            // Générer un token JWT pour l'utilisateur
+            $token = JWTAuth::fromUser($utilisateur);
+
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'token' => $token,
+                'user' => [
+                    'id' => $utilisateur->id,
+                    'nom' => $utilisateur->nom,
+                    'prenom' => $utilisateur->prenom,
+                    'role' => $utilisateur->role
+                ]
+            ], 200);
+        } else {
+            return response()->json(['error' => 'Carte RFID non reconnue ou compte bloqué'], 401);
+        }
     }
 
-    return response()->json(['message' => 'Utilisateurs importés avec succès'], 201);
-}
+    public function importCsv(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|mimes:csv,txt',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
 
+        $file = $request->file('csv_file');
+        $csvData = array_map('str_getcsv', file($file));
+        $header = array_shift($csvData);
 
+        $expectedHeader = ['nom', 'prenom', 'role', 'telephone', 'adresse', 'email', 'carte_rfid'];
+        if ($header !== $expectedHeader) {
+            return response()->json(['error' => 'L\'ordre des champs dans le CSV est incorrect. Veuillez suivre cet ordre : ' . implode(', ', $expectedHeader)], 400);
+        }
+
+        foreach ($csvData as $row) {
+            // Vérifiez que chaque ligne a le même nombre de colonnes que l'en-tête
+            if (count($row) !== count($header)) {
+                return response()->json(['error' => 'Le fichier CSV contient des lignes avec un nombre incorrect de colonnes.'], 400);
+            }
+
+            $data = array_combine($header, $row);
+            $utilisateur = Utilisateur::create([
+                'nom' => $data['nom'],
+                'prenom' => $data['prenom'],
+                'role' => $data['role'],
+                'telephone' => $data['telephone'],
+                'adresse' => $data['adresse'],
+                'email' => $data['email'],
+                'carte_rfid' => $data['carte_rfid'] ?? null,
+                'matricule' => $this->generateMatricule($data['role']),
+                'code_secret' => $this->generateCodeSecret(),
+                'status' => 'actif', // Définir l'utilisateur comme actif par défaut
+            ]);
+
+            // Enregistrer l'action après l'importation de chaque utilisateur
+            $this->logAction($utilisateur->id, $utilisateur->nom, $utilisateur->prenom, 'Importation d\'utilisateur');
+        }
+
+        return response()->json(['message' => 'Utilisateurs importés avec succès'], 201);
+    }
 }

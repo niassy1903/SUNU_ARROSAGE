@@ -66,6 +66,12 @@ export class UtilisateurService {
     return this.http.post(`${this.apiUrl}/block-multiple`, { ids, userId });
   }
 
+    // Débloquer plusieurs utilisateurs
+    unblockMultipleUtilisateurs(ids: string[]): Observable<any> {
+      const userId = localStorage.getItem('userId'); // Récupérer l'ID de l'utilisateur connecté
+      return this.http.post(`${this.apiUrl}/unblock-multiple`, { ids, userId });
+    }
+      
   // Changer le rôle d'un utilisateur
   switchRole(id: string): Observable<any> {
     const userId = localStorage.getItem('userId'); // Récupérer l'ID de l'utilisateur connecté
