@@ -50,8 +50,11 @@
                 <div *ngIf="adresseError" class="text-danger">{{ adresseError }}</div>
               </div>
             </div>
-            
-            <button type="submit" class="btn btn-success btn-block" [disabled]="!inscriptionForm.valid || telephoneError">INSCRIRE</button>
+
+            <div class="d-flex justify-content-center mt-3">
+              <button type="button" class="btn btn-secondary custom-return-btn mr-2" (click)="onRetour()">Retour</button>
+              <button type="submit" class="btn btn-success custom-submit-btn" [disabled]="!inscriptionForm.valid || telephoneError">Mettre à jour</button>
+            </div>
           </form>
         </div>
       </main>
@@ -70,8 +73,8 @@
         </button>
       </div>
       <div class="modal-body">
-        L'utilisateur a été inscrit avec succès. Votre code secret a été envoyé dans votre boîte mail. 
-        Veuillez vérifier votre boîte de réception ( vérifier le dossier spam) pour le code secret.
+        L'utilisateur a été inscrit avec succès. Votre code secret a été envoyé dans votre boîte mail.
+        Veuillez vérifier votre boîte de réception (vérifier le dossier spam) pour le code secret.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>

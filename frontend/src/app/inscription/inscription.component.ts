@@ -141,4 +141,9 @@ export class InscriptionComponent {
       }
     );
   }
+
+  onRetour() {
+    this.router.navigate(['/utilisateur']); // Replace '/previous-page' with the actual route you want to navigate to
+  }
+  
 }

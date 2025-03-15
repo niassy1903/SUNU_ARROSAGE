@@ -33,3 +33,28 @@
   background-color: #219e72;
   border-color: #219e72;
 }
+
+.custom-return-btn {
+  background-color: #6c757d;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.custom-submit-btn {
+  background-color: #ff851b;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.custom-submit-btn:hover,
+.custom-return-btn:hover {
+  opacity: 0.9;
+}

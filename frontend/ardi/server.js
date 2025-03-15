@@ -11,16 +11,16 @@ app.use(cors());
 
 // Configuration SSH pour se connecter au Raspberry Pi
 const sshConfig = {
-    host: '192.168.1.26',
+    host: '192.168.1.69',
     port: 22,
-    username: 'antamaguette',
-    password: 'antamaguette',
+    username: 'bamba',
+    password: 'bamba',
     readyTimeout: 0 // Désactive le timeout de connexion
   };
   
 
 // Commande à exécuter sur le Raspberry Pi
-const command = 'python3 /home/antamaguette/ardi.py';
+const command = 'python3 /home/bamba/capteur.py';
 
 let sensorData = { humidity: null, light: null, waterLevel: null }; // Ajouter un niveau d'eau
 

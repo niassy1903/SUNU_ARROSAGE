@@ -16,10 +16,10 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const raspberryPiConfig = {
-  host: '192.168.1.26',
+  host: '192.168.1.69',
   port: 22,
-  username: 'antamaguette',
-  password: 'antamaguette'
+  username: 'bamba',
+  password: 'bamba'
 };
 
 app.use(bodyParser.json());
@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
   conn.on('ready', () => {
     console.log("Connexion SSH établie avec le Raspberry Pi !");
 
-    const command = 'python3 /home/ardi.py';
+    const command = 'python3 /home/capteur.py';
 
     conn.exec(command, (err, stream) => {
       if (err) {
